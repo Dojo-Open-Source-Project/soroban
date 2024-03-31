@@ -86,6 +86,7 @@ type SorobanInfo struct {
 	Hostname      string
 	Port          int
 	Announce      string
+	IPv4          bool
 }
 
 func (p *SorobanInfo) Merge(s SorobanInfo) {
@@ -115,6 +116,9 @@ func (p *SorobanInfo) Merge(s SorobanInfo) {
 	}
 	if len(s.Announce) > 0 {
 		p.Announce = s.Announce
+	}
+	if s.IPv4 {
+		p.IPv4 = s.IPv4
 	}
 }
 

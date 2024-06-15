@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"fmt"
+	"os"
 	"regexp"
 	"runtime"
 	"strings"
@@ -19,10 +20,28 @@ import (
 	"golang.org/x/crypto/sha3"
 )
 
-func GenKey(prefix string) {
-	r := regexp.MustCompile(fmt.Sprintf("^(?i)%s", prefix))
+func GenKey(prefix string, count int) {
+	found := make(chan bool)
+
+	go func(found chan bool) {
+		for range found {
+			count--
+			if count == 0 {
+				os.Exit(0)
+			}
+		}
+
+	}(found)
+
+	if prefix == "*" {
+		prefix = ""
+	}
+	r := regexp.MustCompile(".*")
+	if len(prefix) > 0 {
+		r = regexp.MustCompile(fmt.Sprintf("^(?i)%s", prefix))
+	}
 	for index := 0; index < runtime.NumCPU(); index++ {
-		go search(index, r)
+		go search(index, r, found)
 	}
 
 	<-context.Background().Done()
@@ -34,7 +53,7 @@ const version = byte(0x03)
 // Salt used to create checkdigits
 const salt = "samourai-soroban"
 
-func search(id int, r *regexp.Regexp) {
+func search(id int, r *regexp.Regexp, found chan bool) {
 	count := 0
 	for {
 		count++
@@ -48,6 +67,7 @@ func search(id int, r *regexp.Regexp) {
 			fmt.Println("Address:", getServiceID(pub)+".onion")
 			fmt.Println("Private Key:", expandKey(pri))
 			fmt.Println("Seed: ", hex.EncodeToString(pri.Seed()))
+			found <- true
 		} else {
 			if id == 0 && count%10000 == 0 {
 				log.Println("Count: ", count)

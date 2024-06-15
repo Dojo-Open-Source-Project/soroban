@@ -22,8 +22,9 @@ import (
 var (
 	options soroban.Options = soroban.DefaultOptions
 
-	prefix string
-	export string
+	prefix   string
+	genCount int = 10
+	export   string
 )
 
 func init() {
@@ -35,6 +36,7 @@ func init() {
 
 	// GenKey
 	flag.StringVar(&prefix, "prefix", prefix, "Generate Onion with prefix")
+	flag.IntVar(&genCount, "genCount", genCount, "Limit generated keys (0 for no limits)")
 	flag.StringVar(&export, "export", "", "Export hidden service secret key from seed to file")
 
 	// Server
@@ -115,7 +117,7 @@ func main() {
 
 func run() error {
 	if len(prefix) > 0 {
-		server.GenKey(prefix)
+		server.GenKey(prefix, genCount)
 		return nil
 	}
 	prefix = strings.Trim(prefix, " ")

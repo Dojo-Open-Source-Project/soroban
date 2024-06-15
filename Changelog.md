@@ -1,5 +1,14 @@
 # Soroban Changelog
 
+## [v0.3.2] - 2024-06-15
+
+- Add Stats endpoints
+- Add Announce protocol
+- Add GenKey limit
+- Fix advertize panic
+- Fix standalone start
+- Fix clearnet p2p
+
 ## [v0.3.1] - 2024-03-03
 
 Split directory p2p service

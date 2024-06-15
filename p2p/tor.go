@@ -84,8 +84,6 @@ func initTorP2P(ctx context.Context, p2pSeed string, listenPort int) ([]libp2p.O
 	resolver := madns.DefaultResolver // Noop
 	madns.DefaultResolver = resolver  //onion.NewTorResover("localhost:2121")
 
-	dialOnlyOnion := true
-
 	// Create the libp2p transport option.
 	// Create address option.
 	onionAddr, err := multiaddr.NewMultiaddr(fmt.Sprintf("/onion3/%s:%d", onionService.ID, listenPort))
@@ -109,7 +107,7 @@ func initTorP2P(ctx context.Context, p2pSeed string, listenPort int) ([]libp2p.O
 		libp2p.Identity(priv),
 
 		libp2p.ListenAddrs(onionAddr),
-		libp2p.Transport(onion.NewOnionTransportC(priv, dialer, onionService, dialOnlyOnion)),
+		libp2p.Transport(onion.NewOnionTransportC(priv, dialer, onionService)),
 		libp2p.DefaultMuxers,
 		libp2p.DefaultPeerstore,
 

@@ -15,7 +15,7 @@ type OnionListener struct {
 	raddr     ma.Multiaddr
 	listener  net.Listener
 	transport tpt.Transport
-	Upgrader  tpt.Upgrader
+	upgrader  tpt.Upgrader
 }
 
 // Accept blocks until a connection is received returning

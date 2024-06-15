@@ -19,10 +19,12 @@ var (
 			Seed:          "",
 			Hostname:      "localhost",
 			Port:          4242,
+			Announce:      "soroban.announce.nodes",
 		},
 		P2P: P2PInfo{
-			Seed:       "auto",
+			Seed:       "",
 			Bootstrap:  "",
+			Hostname:   "",
 			ListenPort: 1042,
 			Room:       "samourai-p2p",
 		},
@@ -83,6 +85,8 @@ type SorobanInfo struct {
 	Seed          string
 	Hostname      string
 	Port          int
+	Announce      string
+	IPv4          bool
 }
 
 func (p *SorobanInfo) Merge(s SorobanInfo) {
@@ -110,11 +114,18 @@ func (p *SorobanInfo) Merge(s SorobanInfo) {
 	if s.Port > 0 {
 		p.Port = s.Port
 	}
+	if len(s.Announce) > 0 {
+		p.Announce = s.Announce
+	}
+	if s.IPv4 {
+		p.IPv4 = s.IPv4
+	}
 }
 
 type P2PInfo struct {
 	Seed       string
 	Bootstrap  string
+	Hostname   string
 	ListenPort int
 	Room       string
 }
@@ -125,6 +136,9 @@ func (p *P2PInfo) Merge(i P2PInfo) {
 	}
 	if len(i.Bootstrap) > 0 {
 		p.Bootstrap = i.Bootstrap
+	}
+	if len(i.Hostname) > 0 {
+		p.Hostname = i.Hostname
 	}
 	if i.ListenPort > 0 {
 		p.ListenPort = i.ListenPort

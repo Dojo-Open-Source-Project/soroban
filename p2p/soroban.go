@@ -11,6 +11,7 @@ import (
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
 	"github.com/libp2p/go-libp2p/core/network"
 	"github.com/libp2p/go-libp2p/core/peer"
+	"github.com/libp2p/go-libp2p/p2p/net/connmgr"
 	"github.com/libp2p/go-libp2p/p2p/net/swarm"
 	"github.com/multiformats/go-multiaddr"
 
@@ -31,6 +32,8 @@ func (p *P2P) Start(ctx context.Context, optionsP2P soroban.P2PInfo, ready chan 
 	p2pSeed := optionsP2P.Seed
 	hostname := optionsP2P.Hostname
 	listenPort := optionsP2P.ListenPort
+	lowWater := optionsP2P.LowWater
+	highWater := optionsP2P.HighWater
 	bootstrap := optionsP2P.Bootstrap
 	room := optionsP2P.Room
 
@@ -39,9 +42,14 @@ func (p *P2P) Start(ctx context.Context, optionsP2P soroban.P2PInfo, ready chan 
 		ready <- struct{}{}
 	}()
 
+	mgr, err := connmgr.NewConnManager(lowWater, highWater)
+	if err != nil {
+		return err
+	}
+
 	var opts []libp2p.Option
 	if len(p2pSeed) > 0 {
-		p2pOpts, err := initTorP2P(ctx, p2pSeed, listenPort)
+		p2pOpts, err := initTorP2P(ctx, p2pSeed, mgr, listenPort)
 		if err != nil {
 			return err
 		}
@@ -59,6 +67,7 @@ func (p *P2P) Start(ctx context.Context, optionsP2P soroban.P2PInfo, ready chan 
 			libp2p.RandomIdentity,
 			libp2p.DefaultPeerstore,
 			libp2p.DefaultMultiaddrResolver,
+			libp2p.ConnectionManager(mgr),
 		}...)
 	}
 

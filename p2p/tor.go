@@ -15,13 +15,14 @@ import (
 	"github.com/cretz/bine/tor"
 	"github.com/libp2p/go-libp2p"
 	"github.com/libp2p/go-libp2p/core/crypto"
+	"github.com/libp2p/go-libp2p/p2p/net/connmgr"
 	"github.com/multiformats/go-multiaddr"
 	madns "github.com/multiformats/go-multiaddr-dns"
 
 	log "github.com/sirupsen/logrus"
 )
 
-func initTorP2P(ctx context.Context, p2pSeed string, listenPort int) ([]libp2p.Option, error) {
+func initTorP2P(ctx context.Context, p2pSeed string, mgr *connmgr.BasicConnMgr, listenPort int) ([]libp2p.Option, error) {
 	extraArgs := []string{
 		// "--DNSPort", "2121",
 	}
@@ -110,7 +111,7 @@ func initTorP2P(ctx context.Context, p2pSeed string, listenPort int) ([]libp2p.O
 		libp2p.Transport(onion.NewOnionTransportC(priv, dialer, onionService)),
 		libp2p.DefaultMuxers,
 		libp2p.DefaultPeerstore,
-
+		libp2p.ConnectionManager(mgr),
 		libp2p.NoSecurity,
 		libp2p.WithDialTimeout(5 * time.Minute),
 		libp2p.EnableRelay(),

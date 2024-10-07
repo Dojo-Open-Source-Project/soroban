@@ -9,8 +9,10 @@ import (
 	soroban "code.samourai.io/wallet/samourai-soroban"
 	"github.com/libp2p/go-libp2p"
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
+	"github.com/libp2p/go-libp2p/core/discovery"
 	"github.com/libp2p/go-libp2p/core/network"
 	"github.com/libp2p/go-libp2p/core/peer"
+	drouting "github.com/libp2p/go-libp2p/p2p/discovery/routing"
 	"github.com/libp2p/go-libp2p/p2p/net/connmgr"
 	"github.com/libp2p/go-libp2p/p2p/net/swarm"
 	"github.com/multiformats/go-multiaddr"
@@ -28,7 +30,7 @@ func (p *P2P) Valid() bool {
 	return p.topic != nil
 }
 
-func (p *P2P) Start(ctx context.Context, optionsP2P soroban.P2PInfo, ready chan struct{}) error {
+func (p *P2P) Start(ctx context.Context, optionsP2P soroban.P2PInfo, optionsGossip soroban.GossipInfo, ready chan struct{}) error {
 	p2pSeed := optionsP2P.Seed
 	hostname := optionsP2P.Hostname
 	listenPort := optionsP2P.ListenPort
@@ -36,6 +38,15 @@ func (p *P2P) Start(ctx context.Context, optionsP2P soroban.P2PInfo, ready chan 
 	highWater := optionsP2P.HighWater
 	bootstrap := optionsP2P.Bootstrap
 	room := optionsP2P.Room
+
+	d := optionsGossip.D
+	dhi := optionsGossip.Dhi
+	dlo := optionsGossip.Dlo
+	dout := optionsGossip.Dout
+	dlazy := optionsGossip.Dlazy
+	dscore := optionsGossip.Dscore
+	prunePeers := optionsGossip.PrunePeers
+	limit := optionsGossip.Limit
 
 	ctx = network.WithDialPeerTimeout(ctx, 3*time.Minute)
 	defer func() {
@@ -93,11 +104,27 @@ func (p *P2P) Start(ctx context.Context, optionsP2P soroban.P2PInfo, ready chan 
 		return err
 	}
 
-	discoverReady := make(chan struct{})
-	go Discover(ctx, host, dht, room, discoverReady)
-	<-discoverReady
+	// Initialize the routing discovery for the pubsub protocol
+	routingDiscovery := drouting.NewRoutingDiscovery(dht)
+	discOpts := []discovery.Option{discovery.Limit(limit), discovery.TTL(30 * time.Second)}
 
-	gossipSub, err := pubsub.NewGossipSub(ctx, host)
+	// Initialize the gossipsub protocol
+	params := pubsub.DefaultGossipSubParams()
+	params.D = d
+	params.Dlo = dlo
+	params.Dhi = dhi
+	params.Dout = dout
+	params.Dscore = dscore
+	params.Dlazy = dlazy
+	params.GossipFactor = 0.25
+	params.PrunePeers = prunePeers
+
+	gossipSub, err := pubsub.NewGossipSub(
+		ctx,
+		host,
+		pubsub.WithGossipSubParams(params),
+		pubsub.WithDiscovery(routingDiscovery, pubsub.WithDiscoveryOpts(discOpts...)),
+	)
 	if err != nil {
 		return err
 	}

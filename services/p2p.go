@@ -37,7 +37,7 @@ func StartP2PDirectory(ctx context.Context, options soroban.Options, ready chan 
 
 	p2pReady := make(chan struct{})
 	go func() {
-		err := p2P.Start(ctx, options.P2P, p2pReady)
+		err := p2P.Start(ctx, options.P2P, options.Gossip, p2pReady)
 		if err != nil {
 			log.WithError(err).Error("Failed to p2P.Start")
 		}

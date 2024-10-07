@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"time"
 
+	soroban "code.samourai.io/wallet/samourai-soroban"
 	"github.com/libp2p/go-libp2p"
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
 	"github.com/libp2p/go-libp2p/core/network"
@@ -26,7 +27,13 @@ func (p *P2P) Valid() bool {
 	return p.topic != nil
 }
 
-func (p *P2P) Start(ctx context.Context, p2pSeed string, hostname string, listenPort int, bootstrap, room string, ready chan struct{}) error {
+func (p *P2P) Start(ctx context.Context, optionsP2P soroban.P2PInfo, ready chan struct{}) error {
+	p2pSeed := optionsP2P.Seed
+	hostname := optionsP2P.Hostname
+	listenPort := optionsP2P.ListenPort
+	bootstrap := optionsP2P.Bootstrap
+	room := optionsP2P.Room
+
 	ctx = network.WithDialPeerTimeout(ctx, 3*time.Minute)
 	defer func() {
 		ready <- struct{}{}

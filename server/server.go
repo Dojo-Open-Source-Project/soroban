@@ -168,7 +168,7 @@ func New(ctx context.Context, options soroban.Options) (context.Context, *Soroba
 		}
 
 		ready := make(chan struct{})
-		go services.StartP2PDirectory(ctx, options.P2P.Seed, options.P2P.Bootstrap, options.P2P.Hostname, options.P2P.ListenPort, options.P2P.Room, ready)
+		go services.StartP2PDirectory(ctx, options, ready)
 		<-ready
 		log.Info("P2PDirectory service started")
 	}

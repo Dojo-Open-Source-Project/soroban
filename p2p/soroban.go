@@ -73,7 +73,7 @@ func (p *P2P) Start(ctx context.Context, optionsP2P soroban.P2PInfo, ready chan 
 
 	// create the swarm
 	swarm.BackoffBase = 30 * time.Second
-	host, err := libp2p.NewWithoutDefaults(opts...)
+	host, err := libp2p.New(opts...)
 	if err != nil {
 		return err
 	}

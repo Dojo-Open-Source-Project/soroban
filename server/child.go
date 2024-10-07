@@ -39,6 +39,16 @@ func startChildSoroban(ctx context.Context, options soroban.Options, childID int
 		"--p2pRoom", options.P2P.Room,
 		"--p2pHostname", options.P2P.Hostname,
 		"--p2pListenPort", strconv.Itoa(options.P2P.ListenPort+childID),
+		"--p2pLowWater", strconv.Itoa(options.P2P.LowWater),
+		"--p2pHighWater", strconv.Itoa(options.P2P.HighWater),
+		"--gossipD", strconv.Itoa(options.Gossip.D),
+		"--gossipDlo", strconv.Itoa(options.Gossip.Dlo),
+		"--gossipDhi", strconv.Itoa(options.Gossip.Dhi),
+		"--gossipDout", strconv.Itoa(options.Gossip.Dout),
+		"--gossipDscore", strconv.Itoa(options.Gossip.Dscore),
+		"--gossipDlazy", strconv.Itoa(options.Gossip.Dlazy),
+		"--gossipPrunePeers", strconv.Itoa(options.Gossip.PrunePeers),
+		"--gossipLimit", strconv.Itoa(options.Gossip.Limit),
 		"--log", log.GetLevel().String(),
 	)
 

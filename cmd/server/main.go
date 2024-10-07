@@ -56,7 +56,18 @@ func init() {
 	flag.StringVar(&options.P2P.Bootstrap, "p2pBootstrap", options.P2P.Bootstrap, "P2P bootstrap")
 	flag.StringVar(&options.P2P.Hostname, "p2pHostname", options.P2P.Hostname, "P2P Hostname")
 	flag.IntVar(&options.P2P.ListenPort, "p2pListenPort", options.P2P.ListenPort, "P2P Listen Port")
+	flag.IntVar(&options.P2P.LowWater, "p2pLowWater", options.P2P.LowWater, "P2P Connection Low Watermark")
+	flag.IntVar(&options.P2P.HighWater, "p2pHighWater", options.P2P.HighWater, "P2P Connection High Watermark")
 	flag.StringVar(&options.P2P.Room, "p2pRoom", options.P2P.Room, "P2P Room")
+
+	flag.IntVar(&options.Gossip.D, "gossipD", options.Gossip.D, "Gossip D")
+	flag.IntVar(&options.Gossip.Dlo, "gossipDlo", options.Gossip.Dlo, "Gossip Dlo")
+	flag.IntVar(&options.Gossip.Dhi, "gossipDhi", options.Gossip.Dhi, "Gossip Dhi")
+	flag.IntVar(&options.Gossip.Dout, "gossipDout", options.Gossip.Dout, "Gossip Dout")
+	flag.IntVar(&options.Gossip.Dscore, "gossipDscore", options.Gossip.Dscore, "Gossip Dscore")
+	flag.IntVar(&options.Gossip.Dlazy, "gossipDlazy", options.Gossip.Dlazy, "Gossip Dlazy")
+	flag.IntVar(&options.Gossip.PrunePeers, "gossipPrunePeers", options.Gossip.PrunePeers, "Gossip PrunePeers")
+	flag.IntVar(&options.Gossip.Limit, "gossipLimit", options.Gossip.Limit, "Gossip Limit")
 
 	flag.StringVar(&options.IPC.Subject, "ipcSubject", options.IPC.Subject, "IPC communication subject")
 	flag.IntVar(&options.IPC.ChildID, "ipcChildID", options.IPC.ChildID, "IPC child ID")

@@ -115,6 +115,5 @@ func initTorP2P(ctx context.Context, p2pSeed string, mgr *connmgr.BasicConnMgr, 
 		libp2p.NoSecurity,
 		libp2p.WithDialTimeout(5 * time.Minute),
 		libp2p.EnableRelay(),
-		libp2p.EnableAutoRelay(),
 	}, nil
 }

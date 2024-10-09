@@ -28,6 +28,11 @@ func startChildSoroban(ctx context.Context, options soroban.Options, childID int
 		log.Fatal("Soroban executable not found")
 	}
 
+	dhtServerMode := ""
+	if options.P2P.DHTServerMode {
+		dhtServerMode = "--p2pDHTServerMode"
+	}
+
 	go ipc.StartProcessDaemon(ctx, fmt.Sprintf("soroban-child-%d", childID),
 		executablePath,
 		// "--config", optionsc.Soroban.Config,
@@ -50,6 +55,7 @@ func startChildSoroban(ctx context.Context, options soroban.Options, childID int
 		"--gossipPrunePeers", strconv.Itoa(options.Gossip.PrunePeers),
 		"--gossipLimit", strconv.Itoa(options.Gossip.Limit),
 		"--log", log.GetLevel().String(),
+		dhtServerMode, // Must be the last flag
 	)
 
 }

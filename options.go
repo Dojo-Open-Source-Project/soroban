@@ -22,13 +22,14 @@ var (
 			Announce:      "soroban.announce.nodes",
 		},
 		P2P: P2PInfo{
-			Seed:       "",
-			Bootstrap:  "",
-			Hostname:   "",
-			ListenPort: 1042,
-			LowWater:   16, // = 2*Gossip.Dlo
-			HighWater:  40, // = 2*Gossip.Dhi
-			Room:       "samourai-p2p",
+			Seed:          "",
+			Bootstrap:     "",
+			Hostname:      "",
+			ListenPort:    1042,
+			LowWater:      16, // = 2*Gossip.Dlo
+			HighWater:     40, // = 2*Gossip.Dhi
+			Room:          "samourai-p2p",
+			DHTServerMode: false,
 		},
 		Gossip: GossipInfo{
 			D:          10, // = ceil(exp(ln(NB_P2P_NODES)/AVG_NB_HOPS))
@@ -137,13 +138,14 @@ func (p *SorobanInfo) Merge(s SorobanInfo) {
 }
 
 type P2PInfo struct {
-	Seed       string
-	Bootstrap  string
-	Hostname   string
-	ListenPort int
-	LowWater   int
-	HighWater  int
-	Room       string
+	Seed          string
+	Bootstrap     string
+	Hostname      string
+	ListenPort    int
+	LowWater      int
+	HighWater     int
+	Room          string
+	DHTServerMode bool
 }
 
 func (p *P2PInfo) Merge(i P2PInfo) {
@@ -167,6 +169,9 @@ func (p *P2PInfo) Merge(i P2PInfo) {
 	}
 	if len(i.Room) > 0 {
 		p.Room = i.Room
+	}
+	if i.DHTServerMode {
+		p.DHTServerMode = i.DHTServerMode
 	}
 }
 

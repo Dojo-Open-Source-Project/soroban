@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	soroban "code.samourai.io/wallet/samourai-soroban"
@@ -89,17 +90,34 @@ func (p *P2P) Start(ctx context.Context, optionsP2P soroban.P2PInfo, optionsGoss
 		return err
 	}
 
-	for _, addr := range host.Addrs() {
-		log.WithField("Addr", addr.String()).Info("P2P addr")
+	isBoostrapNode := false
+
+	localAddresses := []string{}
+	for _, a := range host.Addrs() {
+		localAddresses = append(localAddresses, a.String())
+		log.WithField("Addr", a.String()).Info("P2P addr")
 	}
 
-	addrs := []multiaddr.Multiaddr{}
-	addr, err := multiaddr.NewMultiaddr(bootstrap)
-	if err != nil {
-		return err
+	bootstrapAddresses := []multiaddr.Multiaddr{}
+	bootstrapAddr := strings.Split(bootstrap, ",")
+	for _, b := range bootstrapAddr {
+		a, err := multiaddr.NewMultiaddr(b)
+		if err != nil {
+			return err
+		}
+		bootstrapAddresses = append(bootstrapAddresses, a)
+		log.Debugf("Bootstrap address: %s", a.String())
+		for _, l := range localAddresses {
+			if strings.HasPrefix(a.String(), l) {
+				isBoostrapNode = true
+				break
+			}
+		}
 	}
-	addrs = append(addrs, addr)
-	dht, err := NewDHT(ctx, host, addrs...)
+
+	log.Debugf("isBootstrap: %t", isBoostrapNode)
+
+	dht, err := NewDHT(ctx, host, bootstrapAddresses...)
 	if err != nil {
 		return err
 	}

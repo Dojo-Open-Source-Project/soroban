@@ -51,7 +51,7 @@ func GenKey(prefix string, count int) {
 const version = byte(0x03)
 
 // Salt used to create checkdigits
-const salt = "samourai-soroban"
+const salt = ".onion checksum"
 
 func search(id int, r *regexp.Regexp, found chan bool) {
 	count := 0

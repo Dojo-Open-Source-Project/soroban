@@ -97,7 +97,7 @@ func (p *P2P) Start(ctx context.Context, optionsP2P soroban.P2PInfo, optionsGoss
 	localAddresses := []string{}
 	for _, a := range host.Addrs() {
 		localAddresses = append(localAddresses, a.String())
-		log.WithField("Addr", a.String()).Info("P2P addr")
+		log.Printf("Peer address: %s/p2p/%s", a.String(), host.ID().String())
 	}
 
 	bootstrapAddresses := []multiaddr.Multiaddr{}

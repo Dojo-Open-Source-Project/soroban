@@ -7,7 +7,6 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
-	"time"
 
 	soroban "code.samourai.io/wallet/samourai-soroban"
 	"code.samourai.io/wallet/samourai-soroban/p2p/onion"
@@ -51,9 +50,10 @@ func initTorP2P(ctx context.Context, p2pSeed string, mgr *connmgr.BasicConnMgr, 
 
 	// Create the embedded Tor client.
 	torClient, err := tor.Start(ctx, &tor.StartConf{
-		DebugWriter:     io.Discard,
-		TempDataDirBase: "/tmp",
-		ExtraArgs:       extraArgs,
+		DebugWriter:       io.Discard,
+		TempDataDirBase:   "/tmp",
+		RetainTempDataDir: false,
+		ExtraArgs:         extraArgs,
 	})
 	if err != nil {
 		log.WithError(err).Error("Failed to tor.Start")
@@ -77,21 +77,17 @@ func initTorP2P(ctx context.Context, p2pSeed string, mgr *connmgr.BasicConnMgr, 
 		return nil, err
 	}
 
+	if _, err := torClient.Dialer(context.Background(), nil); err != nil {
+		log.WithError(err).Panic("Failed to establish Tor dialer")
+	}
+
 	// Override the default lip2p DNS resolver. We need this because libp2p address may contain a
 	// DNS hostname that will be resolved before dialing. If we do not configure the resolver to
 	// use Tor we will blow any anonymity we gained by using Tor.
 	//
 	// Note you must enter the DNS resolver address that was used when creating the Tor client.
-	resolver := madns.DefaultResolver // Noop
-	madns.DefaultResolver = resolver  //onion.NewTorResover("localhost:2121")
-
-	// Create the libp2p transport option.
-	// Create address option.
-	onionAddr, err := multiaddr.NewMultiaddr(fmt.Sprintf("/onion3/%s:%d", onionService.ID, listenPort))
-	if err != nil {
-		log.WithError(err).Error("Failed to NewMultiaddr onion3")
-		return nil, err
-	}
+	//resolver := madns.DefaultResolver // Noop
+	madns.DefaultResolver = onion.NewTorResolver("localhost:2121")
 
 	// Create the dialer.
 	//
@@ -104,16 +100,27 @@ func initTorP2P(ctx context.Context, p2pSeed string, mgr *connmgr.BasicConnMgr, 
 		return nil, err
 	}
 
+	// Create the libp2p transport option.
+	// Create address option.
+	onionAddr, err := multiaddr.NewMultiaddr(fmt.Sprintf("/onion3/%s:%d", onionService.ID, listenPort))
+	if err != nil {
+		log.WithError(err).Error("Failed to NewMultiaddr onion3")
+		return nil, err
+	}
+
 	return []libp2p.Option{
 		libp2p.Identity(priv),
-
 		libp2p.ListenAddrs(onionAddr),
 		libp2p.Transport(onion.NewOnionTransportC(priv, dialer, onionService)),
-		libp2p.DefaultMuxers,
-		libp2p.DefaultPeerstore,
+		libp2p.DefaultMultiaddrResolver,
 		libp2p.ConnectionManager(mgr),
-		libp2p.NoSecurity,
-		libp2p.WithDialTimeout(5 * time.Minute),
-		libp2p.EnableRelay(),
+		libp2p.Ping(true),
+		libp2p.UserAgent("Soroban"),
+		// libp2p.DefaultMuxers,
+		// libp2p.DefaultPeerstore,
+		// libp2p.ConnectionManager(mgr),
+		// libp2p.NoSecurity,
+		// libp2p.WithDialTimeout(5 * time.Minute),
+		// libp2p.EnableRelay(),
 	}, nil
 }

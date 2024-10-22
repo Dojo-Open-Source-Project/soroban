@@ -132,48 +132,46 @@ func (p *P2P) Start(ctx context.Context, optionsP2P soroban.P2PInfo, optionsGoss
 		return err
 	}
 
-	// Bootstrap nodes don't participate to the pubsub proocol
-	if !isBoostrapNode {
-		// Initialize the routing discovery for the pubsub protocol
-		routingDiscovery := drouting.NewRoutingDiscovery(dht)
-		discOpts := []discovery.Option{discovery.Limit(limit), discovery.TTL(30 * time.Second)}
+	// Initialize the routing discovery for the pubsub protocol
+	routingDiscovery := drouting.NewRoutingDiscovery(dht)
+	discOpts := []discovery.Option{discovery.Limit(limit), discovery.TTL(30 * time.Second)}
 
-		// Initialize the gossipsub protocol
-		params := pubsub.DefaultGossipSubParams()
-		params.D = d
-		params.Dlo = dlo
-		params.Dhi = dhi
-		params.Dout = dout
-		params.Dscore = dscore
-		params.Dlazy = dlazy
-		params.GossipFactor = 0.25
-		params.PrunePeers = prunePeers
+	// Initialize the gossipsub protocol
+	params := pubsub.DefaultGossipSubParams()
+	params.D = d
+	params.Dlo = dlo
+	params.Dhi = dhi
+	params.Dout = dout
+	params.Dscore = dscore
+	params.Dlazy = dlazy
+	params.GossipFactor = 0.25
+	params.PrunePeers = prunePeers
 
-		gossipSub, err := pubsub.NewGossipSub(
-			ctx,
-			host,
-			pubsub.WithGossipSubParams(params),
-			pubsub.WithDiscovery(routingDiscovery, pubsub.WithDiscoveryOpts(discOpts...)),
-		)
-		if err != nil {
-			return err
-		}
-
-		topic, err := gossipSub.Join(room)
-		if err != nil {
-			return err
-		}
-
-		p.topic = topic
-
-		// subscribe to topic
-		subscriber, err := topic.Subscribe()
-		if err != nil {
-			return err
-		}
-
-		go p.subscribe(ctx, subscriber, host.ID())
+	gossipSub, err := pubsub.NewGossipSub(
+		ctx,
+		host,
+		pubsub.WithGossipSubParams(params),
+		pubsub.WithDiscovery(routingDiscovery, pubsub.WithDiscoveryOpts(discOpts...)),
+	)
+	if err != nil {
+		return err
 	}
+
+	topic, err := gossipSub.Join(room)
+	if err != nil {
+		return err
+	}
+
+	p.topic = topic
+
+	// subscribe to topic
+	subscriber, err := topic.Subscribe()
+	if err != nil {
+		return err
+	}
+
+	go p.subscribe(ctx, subscriber, host.ID())
+
 	return nil
 }
 

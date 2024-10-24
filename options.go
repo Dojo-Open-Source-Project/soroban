@@ -20,6 +20,7 @@ var (
 			Hostname:      "localhost",
 			Port:          4242,
 			Announce:      "soroban.announce.nodes",
+			IPv4:          false,
 		},
 		P2P: P2PInfo{
 			Seed:          "",

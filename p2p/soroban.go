@@ -2,8 +2,10 @@ package p2p
 
 import (
 	"context"
+	"crypto/ed25519"
+	"crypto/rand"
+	"encoding/hex"
 	"errors"
-	"fmt"
 	"strings"
 	"time"
 
@@ -34,7 +36,6 @@ func (p *P2P) Valid() bool {
 
 func (p *P2P) Start(ctx context.Context, optionsP2P soroban.P2PInfo, optionsGossip soroban.GossipInfo, ready chan struct{}) error {
 	p2pSeed := optionsP2P.Seed
-	hostname := optionsP2P.Hostname
 	listenPort := optionsP2P.ListenPort
 	lowWater := optionsP2P.LowWater
 	highWater := optionsP2P.HighWater
@@ -61,29 +62,21 @@ func (p *P2P) Start(ctx context.Context, optionsP2P soroban.P2PInfo, optionsGoss
 		return err
 	}
 
-	var opts []libp2p.Option
-	if len(p2pSeed) > 0 {
-		p2pOpts, err := initTorP2P(ctx, p2pSeed, mgr, listenPort)
+	// Generates a p2p seed automatically if none has been provided
+	if len(p2pSeed) == 0 {
+		_, pri, err := ed25519.GenerateKey(rand.Reader)
 		if err != nil {
-			return err
+			log.Fatal(err)
 		}
-		opts = append(opts, p2pOpts...)
+		p2pSeed = hex.EncodeToString(pri.Seed())
 	}
 
-	// fallback to clearnet
-	if len(opts) == 0 {
-		log.Info("P2P Start clearnet")
-		opts = append(opts, []libp2p.Option{
-			libp2p.ListenAddrStrings(fmt.Sprintf("/ip4/%s/tcp/%d", hostname, listenPort)),
-			libp2p.DefaultTransports,
-			libp2p.DefaultMuxers,
-			libp2p.NoSecurity,
-			libp2p.RandomIdentity,
-			libp2p.DefaultPeerstore,
-			libp2p.DefaultMultiaddrResolver,
-			libp2p.ConnectionManager(mgr),
-		}...)
+	var opts []libp2p.Option
+	p2pOpts, err := initTorP2P(ctx, p2pSeed, mgr, listenPort)
+	if err != nil {
+		return err
 	}
+	opts = append(opts, p2pOpts...)
 
 	// create the swarm
 	swarm.BackoffBase = 30 * time.Second

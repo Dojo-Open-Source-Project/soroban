@@ -24,7 +24,6 @@ var (
 		P2P: P2PInfo{
 			Seed:          "",
 			Bootstrap:     "",
-			Hostname:      "",
 			ListenPort:    1042,
 			LowWater:      16, // = 2*Gossip.Dlo
 			HighWater:     40, // = 2*Gossip.Dhi
@@ -140,7 +139,6 @@ func (p *SorobanInfo) Merge(s SorobanInfo) {
 type P2PInfo struct {
 	Seed          string
 	Bootstrap     string
-	Hostname      string
 	ListenPort    int
 	LowWater      int
 	HighWater     int
@@ -154,9 +152,6 @@ func (p *P2PInfo) Merge(i P2PInfo) {
 	}
 	if len(i.Bootstrap) > 0 {
 		p.Bootstrap = i.Bootstrap
-	}
-	if len(i.Hostname) > 0 {
-		p.Hostname = i.Hostname
 	}
 	if i.ListenPort > 0 {
 		p.ListenPort = i.ListenPort

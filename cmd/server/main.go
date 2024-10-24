@@ -54,7 +54,6 @@ func init() {
 
 	flag.StringVar(&options.P2P.Seed, "p2pSeed", options.P2P.Seed, "P2P Onion private key seed")
 	flag.StringVar(&options.P2P.Bootstrap, "p2pBootstrap", options.P2P.Bootstrap, "P2P bootstrap")
-	flag.StringVar(&options.P2P.Hostname, "p2pHostname", options.P2P.Hostname, "P2P Hostname")
 	flag.IntVar(&options.P2P.ListenPort, "p2pListenPort", options.P2P.ListenPort, "P2P Listen Port")
 	flag.IntVar(&options.P2P.LowWater, "p2pLowWater", options.P2P.LowWater, "P2P Connection Low Watermark")
 	flag.IntVar(&options.P2P.HighWater, "p2pHighWater", options.P2P.HighWater, "P2P Connection High Watermark")

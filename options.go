@@ -30,6 +30,7 @@ var (
 			HighWater:     40, // = 2*Gossip.Dhi
 			Room:          "samourai-p2p",
 			DHTServerMode: false,
+			PeerstoreFile: "-",
 		},
 		Gossip: GossipInfo{
 			D:          10, // = ceil(exp(ln(NB_P2P_NODES)/AVG_NB_HOPS))
@@ -145,6 +146,7 @@ type P2PInfo struct {
 	HighWater     int
 	Room          string
 	DHTServerMode bool
+	PeerstoreFile string
 }
 
 func (p *P2PInfo) Merge(i P2PInfo) {
@@ -168,6 +170,9 @@ func (p *P2PInfo) Merge(i P2PInfo) {
 	}
 	if i.DHTServerMode {
 		p.DHTServerMode = i.DHTServerMode
+	}
+	if len(i.PeerstoreFile) > 0 {
+		p.PeerstoreFile = i.PeerstoreFile
 	}
 }
 

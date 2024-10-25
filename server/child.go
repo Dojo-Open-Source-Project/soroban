@@ -45,6 +45,7 @@ func startChildSoroban(ctx context.Context, options soroban.Options, childID int
 		"--p2pListenPort", strconv.Itoa(options.P2P.ListenPort+childID),
 		"--p2pLowWater", strconv.Itoa(options.P2P.LowWater),
 		"--p2pHighWater", strconv.Itoa(options.P2P.HighWater),
+		"--p2pPeerstoreFile", options.P2P.PeerstoreFile,
 		"--gossipD", strconv.Itoa(options.Gossip.D),
 		"--gossipDlo", strconv.Itoa(options.Gossip.Dlo),
 		"--gossipDhi", strconv.Itoa(options.Gossip.Dhi),

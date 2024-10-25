@@ -4,8 +4,14 @@ import (
 	"context"
 	"crypto/ed25519"
 	"crypto/rand"
+	"sync"
+
 	"encoding/hex"
+	"encoding/json"
 	"errors"
+	"fmt"
+	rand2 "math/rand/v2"
+	"os"
 	"strings"
 	"time"
 
@@ -14,6 +20,7 @@ import (
 	dht "github.com/libp2p/go-libp2p-kad-dht"
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
 	"github.com/libp2p/go-libp2p/core/discovery"
+	"github.com/libp2p/go-libp2p/core/host"
 	"github.com/libp2p/go-libp2p/core/network"
 	"github.com/libp2p/go-libp2p/core/peer"
 	drouting "github.com/libp2p/go-libp2p/p2p/discovery/routing"
@@ -26,8 +33,11 @@ import (
 
 // P2P for distributed soroban
 type P2P struct {
-	topic     *pubsub.Topic
 	OnMessage chan Message
+	ChildID   int
+	topic     *pubsub.Topic
+	host      host.Host
+	dht       *dht.IpfsDHT
 }
 
 func (p *P2P) Valid() bool {
@@ -80,7 +90,7 @@ func (p *P2P) Start(ctx context.Context, optionsP2P soroban.P2PInfo, optionsGoss
 
 	// create the swarm
 	swarm.BackoffBase = 30 * time.Second
-	host, err := libp2p.New(opts...)
+	p.host, err = libp2p.New(opts...)
 	if err != nil {
 		return err
 	}
@@ -88,9 +98,9 @@ func (p *P2P) Start(ctx context.Context, optionsP2P soroban.P2PInfo, optionsGoss
 	isBoostrapNode := false
 
 	localAddresses := []string{}
-	for _, a := range host.Addrs() {
+	for _, a := range p.host.Addrs() {
 		localAddresses = append(localAddresses, a.String())
-		log.Printf("Peer address: %s/p2p/%s", a.String(), host.ID().String())
+		log.Printf("Peer address: %s/p2p/%s", a.String(), p.host.ID().String())
 	}
 
 	bootstrapAddresses := []multiaddr.Multiaddr{}
@@ -120,13 +130,22 @@ func (p *P2P) Start(ctx context.Context, optionsP2P soroban.P2PInfo, optionsGoss
 	log.Debugf("isBootstrap: %t", isBoostrapNode)
 	log.Debugf("DHT mode: %s", mode)
 
-	dht, err := NewDHT(ctx, host, mode, bootstrapAddresses...)
+	// Connect node to a few peers persisted on disk
+	if !isBoostrapNode && optionsP2P.PeerstoreFile != "-" {
+		err = p.ConnectToPersistedPeers(ctx, optionsP2P)
+		if err != nil {
+			return err
+		}
+	}
+
+	// Initialize and bootstrap the DHT
+	p.dht, err = NewDHT(ctx, p.host, mode, bootstrapAddresses...)
 	if err != nil {
 		return err
 	}
 
 	// Initialize the routing discovery for the pubsub protocol
-	routingDiscovery := drouting.NewRoutingDiscovery(dht)
+	routingDiscovery := drouting.NewRoutingDiscovery(p.dht)
 	discOpts := []discovery.Option{discovery.Limit(limit), discovery.TTL(30 * time.Second)}
 
 	// Initialize the gossipsub protocol
@@ -142,7 +161,7 @@ func (p *P2P) Start(ctx context.Context, optionsP2P soroban.P2PInfo, optionsGoss
 
 	gossipSub, err := pubsub.NewGossipSub(
 		ctx,
-		host,
+		p.host,
 		pubsub.WithGossipSubParams(params),
 		pubsub.WithDiscovery(routingDiscovery, pubsub.WithDiscoveryOpts(discOpts...)),
 	)
@@ -163,13 +182,18 @@ func (p *P2P) Start(ctx context.Context, optionsP2P soroban.P2PInfo, optionsGoss
 		return err
 	}
 
-	go p.subscribe(ctx, subscriber, host.ID())
+	go p.subscribe(ctx, subscriber)
+
+	// Start persisting the peerstore
+	if optionsP2P.PeerstoreFile != "-" {
+		go StartPeerstorePersistence(ctx, optionsP2P, p)
+	}
 
 	return nil
 }
 
 // start subsriber to topic
-func (p *P2P) subscribe(ctx context.Context, subscriber *pubsub.Subscription, hostID peer.ID) {
+func (p *P2P) subscribe(ctx context.Context, subscriber *pubsub.Subscription) {
 	for {
 		msg, err := subscriber.Next(ctx)
 		if err != nil {
@@ -179,7 +203,7 @@ func (p *P2P) subscribe(ctx context.Context, subscriber *pubsub.Subscription, ho
 		}
 
 		// only consider messages delivered by other peers
-		if msg.ReceivedFrom == hostID {
+		if msg.ReceivedFrom == p.host.ID() {
 			continue
 		}
 
@@ -218,4 +242,91 @@ func (p *P2P) PublishJson(ctx context.Context, context string, payload interface
 	}
 
 	return p.Publish(ctx, string(data))
+}
+
+// Persist the Peerstore
+func StartPeerstorePersistence(ctx context.Context, optionsP2P soroban.P2PInfo, p *P2P) {
+	ticker := time.NewTicker(5 * time.Minute)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ctx.Done():
+			log.Info("Exiting Announce Loop")
+			return
+		case <-ticker.C:
+			p.PersistPeerstore(ctx, optionsP2P)
+		}
+	}
+}
+
+func (p *P2P) PersistPeerstore(ctx context.Context, optionsP2P soroban.P2PInfo) error {
+	var peersAddrs []peer.AddrInfo
+	var i int
+	for _, peerId := range p.host.Network().Peerstore().PeersWithAddrs() {
+		if p.host.ID() == peerId {
+			continue
+		}
+		peerInfo := p.host.Network().Peerstore().PeerInfo(peerId)
+		if len(peerInfo.Addrs) > 0 {
+			peersAddrs = append(peersAddrs, peerInfo)
+			i++
+			if i > optionsP2P.HighWater {
+				break
+			}
+		}
+	}
+
+	if i > 0 {
+		bytes, _ := json.Marshal(peersAddrs)
+		filepath := fmt.Sprintf(optionsP2P.PeerstoreFile+".c%d.json", p.ChildID)
+		file, err := os.Create(filepath)
+		if err != nil {
+			return err
+		}
+		defer file.Close()
+		file.Write(bytes)
+		file.Write([]byte("\n"))
+	}
+
+	return nil
+}
+
+func (p *P2P) ConnectToPersistedPeers(ctx context.Context, optionsP2P soroban.P2PInfo) error {
+	filepath := fmt.Sprintf(optionsP2P.PeerstoreFile+".c%d.json", p.ChildID)
+	bytes, err := os.ReadFile(filepath)
+	if err != nil {
+		return nil
+	}
+
+	var peersAddrs []peer.AddrInfo
+	err = json.Unmarshal(bytes, &peersAddrs)
+	if err != nil {
+		return err
+	}
+
+	maxNbSelectedPeers := optionsP2P.LowWater / 2
+	if len(peersAddrs) > maxNbSelectedPeers {
+		rand2.Shuffle(len(peersAddrs), func(i, j int) { peersAddrs[i], peersAddrs[j] = peersAddrs[j], peersAddrs[i] })
+		peersAddrs = peersAddrs[:maxNbSelectedPeers+1]
+	}
+
+	if len(peersAddrs) > 0 {
+		var wg sync.WaitGroup
+		for _, peerinfo := range peersAddrs {
+			if p.host.ID() != peerinfo.ID {
+				wg.Add(1)
+				go func(peerinfo peer.AddrInfo) {
+					log.Debugf("Boostrapping attempt with %v", peerinfo)
+					defer wg.Done()
+					if err := p.host.Connect(ctx, peerinfo); err != nil {
+						log.WithError(err).Warnf("Bootstrap warning: %v", peerinfo)
+					}
+				}(peerinfo)
+			}
+		}
+		wg.Wait()
+	}
+
+	return nil
 }

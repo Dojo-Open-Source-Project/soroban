@@ -59,6 +59,7 @@ func init() {
 	flag.IntVar(&options.P2P.HighWater, "p2pHighWater", options.P2P.HighWater, "P2P Connection High Watermark")
 	flag.StringVar(&options.P2P.Room, "p2pRoom", options.P2P.Room, "P2P Room")
 	flag.BoolVar(&options.P2P.DHTServerMode, "p2pDHTServerMode", options.P2P.DHTServerMode, "P2P DHT Server Mode")
+	flag.StringVar(&options.P2P.PeerstoreFile, "p2pPeerstoreFile", options.P2P.PeerstoreFile, "Peerstore file (default -)")
 
 	flag.IntVar(&options.Gossip.D, "gossipD", options.Gossip.D, "Gossip D")
 	flag.IntVar(&options.Gossip.Dlo, "gossipDlo", options.Gossip.Dlo, "Gossip Dlo")

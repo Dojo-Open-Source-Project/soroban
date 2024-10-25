@@ -12,6 +12,7 @@ import (
 
 	"crypto"
 	"crypto/ed25519"
+	"crypto/rand"
 
 	soroban "code.samourai.io/wallet/samourai-soroban"
 	"code.samourai.io/wallet/samourai-soroban/confidential"
@@ -239,6 +240,15 @@ func (p *Soroban) StartWithTor(ctx context.Context, hostname string, port int, s
 	if p.t == nil {
 		return errors.New("tor not initialized")
 	}
+
+	if len(seed) == 0 {
+		_, pri, err := ed25519.GenerateKey(rand.Reader)
+		if err != nil {
+			log.Fatal(err)
+		}
+		seed = hex.EncodeToString(pri.Seed())
+	}
+
 	var key crypto.PrivateKey
 	if len(seed) > 0 {
 		str, err := hex.DecodeString(seed)

@@ -116,11 +116,5 @@ func initTorP2P(ctx context.Context, p2pSeed string, mgr *connmgr.BasicConnMgr, 
 		libp2p.ConnectionManager(mgr),
 		libp2p.Ping(true),
 		libp2p.UserAgent("Soroban"),
-		// libp2p.DefaultMuxers,
-		// libp2p.DefaultPeerstore,
-		// libp2p.ConnectionManager(mgr),
-		// libp2p.NoSecurity,
-		// libp2p.WithDialTimeout(5 * time.Minute),
-		// libp2p.EnableRelay(),
 	}, nil
 }

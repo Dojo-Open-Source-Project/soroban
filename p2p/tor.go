@@ -77,18 +77,6 @@ func initTorP2P(ctx context.Context, p2pSeed string, mgr *connmgr.BasicConnMgr, 
 		return nil, err
 	}
 
-	if _, err := torClient.Dialer(context.Background(), nil); err != nil {
-		log.WithError(err).Panic("Failed to establish Tor dialer")
-	}
-
-	// Override the default lip2p DNS resolver. We need this because libp2p address may contain a
-	// DNS hostname that will be resolved before dialing. If we do not configure the resolver to
-	// use Tor we will blow any anonymity we gained by using Tor.
-	//
-	// Note you must enter the DNS resolver address that was used when creating the Tor client.
-	//resolver := madns.DefaultResolver // Noop
-	madns.DefaultResolver = onion.NewTorResolver("localhost:2121")
-
 	// Create the dialer.
 	//
 	// IMPORTANT: If you are genuinely trying to anonymize your IP you will need to route
@@ -99,6 +87,14 @@ func initTorP2P(ctx context.Context, p2pSeed string, mgr *connmgr.BasicConnMgr, 
 		log.WithError(err).Error("Failed to torClient.Dialer")
 		return nil, err
 	}
+
+	// Override the default lip2p DNS resolver. We need this because libp2p address may contain a
+	// DNS hostname that will be resolved before dialing. If we do not configure the resolver to
+	// use Tor we will blow any anonymity we gained by using Tor.
+	//
+	// Note you must enter the DNS resolver address that was used when creating the Tor client.
+	//resolver := madns.DefaultResolver // Noop
+	madns.DefaultResolver = onion.NewTorResolver("localhost:2121")
 
 	// Create the libp2p transport option.
 	// Create address option.

@@ -23,7 +23,7 @@ import (
 
 func initTorP2P(ctx context.Context, p2pSeed string, mgr *connmgr.BasicConnMgr, listenPort int) ([]libp2p.Option, error) {
 	extraArgs := []string{
-		// "--DNSPort", "2121",
+		"--DNSPort", "2121",
 	}
 
 	var privateKey ed25519.PrivateKey

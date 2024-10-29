@@ -252,7 +252,7 @@ func StartPeerstorePersistence(ctx context.Context, optionsP2P soroban.P2PInfo, 
 	for {
 		select {
 		case <-ctx.Done():
-			log.Info("Exiting Announce Loop")
+			log.Info("Exiting peerstore persistence Loop")
 			return
 		case <-ticker.C:
 			p.PersistPeerstore(ctx, optionsP2P)

@@ -262,7 +262,6 @@ func StartPeerstorePersistence(ctx context.Context, optionsP2P soroban.P2PInfo, 
 
 func (p *P2P) PersistPeerstore(ctx context.Context, optionsP2P soroban.P2PInfo) error {
 	var peersAddrs []peer.AddrInfo
-	var i int
 	for _, peerId := range p.host.Network().Peerstore().PeersWithAddrs() {
 		if p.host.ID() == peerId {
 			continue
@@ -270,14 +269,10 @@ func (p *P2P) PersistPeerstore(ctx context.Context, optionsP2P soroban.P2PInfo) 
 		peerInfo := p.host.Network().Peerstore().PeerInfo(peerId)
 		if len(peerInfo.Addrs) > 0 {
 			peersAddrs = append(peersAddrs, peerInfo)
-			i++
-			if i > optionsP2P.HighWater {
-				break
-			}
 		}
 	}
 
-	if i > 0 {
+	if len(peersAddrs) > 0 {
 		bytes, _ := json.Marshal(peersAddrs)
 		filepath := fmt.Sprintf(optionsP2P.PeerstoreFile+".c%d.json", p.ChildID)
 		file, err := os.Create(filepath)

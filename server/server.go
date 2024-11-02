@@ -12,6 +12,7 @@ import (
 
 	"crypto"
 	"crypto/ed25519"
+	"crypto/rand"
 
 	soroban "code.samourai.io/wallet/samourai-soroban"
 	"code.samourai.io/wallet/samourai-soroban/confidential"
@@ -65,7 +66,12 @@ func New(ctx context.Context, options soroban.Options) (context.Context, *Soroba
 	}
 
 	ctx = context.WithValue(ctx, internal.SorobanDirectoryKey, directory)
-	ctx = context.WithValue(ctx, internal.SorobanP2PKey, &p2p.P2P{OnMessage: make(chan p2p.Message)})
+
+	ctx = context.WithValue(ctx, internal.SorobanP2PKey, &p2p.P2P{
+		OnMessage: make(chan p2p.Message),
+		ChildID:   options.IPC.ChildID,
+	})
+
 	if options.IPC.ChildProcessCount > 0 || options.IPC.ChildID > 0 {
 		ctx = context.WithValue(ctx, internal.SorobanIPCKey, ipc.New(ctx, ipc.IPCOptions{
 			Mode:     ipcMode,
@@ -168,7 +174,7 @@ func New(ctx context.Context, options soroban.Options) (context.Context, *Soroba
 		}
 
 		ready := make(chan struct{})
-		go services.StartP2PDirectory(ctx, options.P2P.Seed, options.P2P.Bootstrap, options.P2P.Hostname, options.P2P.ListenPort, options.P2P.Room, ready)
+		go services.StartP2PDirectory(ctx, options, ready)
 		<-ready
 		log.Info("P2PDirectory service started")
 	}
@@ -239,6 +245,15 @@ func (p *Soroban) StartWithTor(ctx context.Context, hostname string, port int, s
 	if p.t == nil {
 		return errors.New("tor not initialized")
 	}
+
+	if len(seed) == 0 {
+		_, pri, err := ed25519.GenerateKey(rand.Reader)
+		if err != nil {
+			log.Fatal(err)
+		}
+		seed = hex.EncodeToString(pri.Seed())
+	}
+
 	var key crypto.PrivateKey
 	if len(seed) > 0 {
 		str, err := hex.DecodeString(seed)

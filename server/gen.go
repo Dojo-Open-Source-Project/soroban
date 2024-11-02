@@ -15,6 +15,8 @@ import (
 	"crypto/rand"
 	"crypto/sha512"
 
+	"github.com/libp2p/go-libp2p/core/crypto"
+	"github.com/libp2p/go-libp2p/core/peer"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/ed25519"
 	"golang.org/x/crypto/sha3"
@@ -51,7 +53,7 @@ func GenKey(prefix string, count int) {
 const version = byte(0x03)
 
 // Salt used to create checkdigits
-const salt = "samourai-soroban"
+const salt = ".onion checksum"
 
 func search(id int, r *regexp.Regexp, found chan bool) {
 	count := 0
@@ -63,8 +65,18 @@ func search(id int, r *regexp.Regexp, found chan bool) {
 		}
 
 		if r.MatchString(base32.StdEncoding.EncodeToString(pub[:])) {
+			priv, err := crypto.UnmarshalSecp256k1PrivateKey(pri.Seed())
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			peerid, err := peer.IDFromPrivateKey(priv)
+			if err != nil {
+				log.Fatal(err)
+			}
 			fmt.Println()
 			fmt.Println("Address:", getServiceID(pub)+".onion")
+			fmt.Println("Peer ID:", peerid.String())
 			fmt.Println("Private Key:", expandKey(pri))
 			fmt.Println("Seed: ", hex.EncodeToString(pri.Seed()))
 			found <- true

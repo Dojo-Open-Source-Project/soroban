@@ -7,7 +7,6 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
-	"time"
 
 	soroban "code.samourai.io/wallet/samourai-soroban"
 	"code.samourai.io/wallet/samourai-soroban/p2p/onion"
@@ -15,15 +14,16 @@ import (
 	"github.com/cretz/bine/tor"
 	"github.com/libp2p/go-libp2p"
 	"github.com/libp2p/go-libp2p/core/crypto"
+	"github.com/libp2p/go-libp2p/p2p/net/connmgr"
 	"github.com/multiformats/go-multiaddr"
 	madns "github.com/multiformats/go-multiaddr-dns"
 
 	log "github.com/sirupsen/logrus"
 )
 
-func initTorP2P(ctx context.Context, p2pSeed string, listenPort int) ([]libp2p.Option, error) {
+func initTorP2P(ctx context.Context, p2pSeed string, mgr *connmgr.BasicConnMgr, listenPort int) ([]libp2p.Option, error) {
 	extraArgs := []string{
-		// "--DNSPort", "2121",
+		"--DNSPort", "2121",
 	}
 
 	var privateKey ed25519.PrivateKey
@@ -50,9 +50,10 @@ func initTorP2P(ctx context.Context, p2pSeed string, listenPort int) ([]libp2p.O
 
 	// Create the embedded Tor client.
 	torClient, err := tor.Start(ctx, &tor.StartConf{
-		DebugWriter:     io.Discard,
-		TempDataDirBase: "/tmp",
-		ExtraArgs:       extraArgs,
+		DebugWriter:       io.Discard,
+		TempDataDirBase:   "/tmp",
+		RetainTempDataDir: false,
+		ExtraArgs:         extraArgs,
 	})
 	if err != nil {
 		log.WithError(err).Error("Failed to tor.Start")
@@ -76,22 +77,6 @@ func initTorP2P(ctx context.Context, p2pSeed string, listenPort int) ([]libp2p.O
 		return nil, err
 	}
 
-	// Override the default lip2p DNS resolver. We need this because libp2p address may contain a
-	// DNS hostname that will be resolved before dialing. If we do not configure the resolver to
-	// use Tor we will blow any anonymity we gained by using Tor.
-	//
-	// Note you must enter the DNS resolver address that was used when creating the Tor client.
-	resolver := madns.DefaultResolver // Noop
-	madns.DefaultResolver = resolver  //onion.NewTorResover("localhost:2121")
-
-	// Create the libp2p transport option.
-	// Create address option.
-	onionAddr, err := multiaddr.NewMultiaddr(fmt.Sprintf("/onion3/%s:%d", onionService.ID, listenPort))
-	if err != nil {
-		log.WithError(err).Error("Failed to NewMultiaddr onion3")
-		return nil, err
-	}
-
 	// Create the dialer.
 	//
 	// IMPORTANT: If you are genuinely trying to anonymize your IP you will need to route
@@ -103,17 +88,29 @@ func initTorP2P(ctx context.Context, p2pSeed string, listenPort int) ([]libp2p.O
 		return nil, err
 	}
 
+	// Override the default lip2p DNS resolver. We need this because libp2p address may contain a
+	// DNS hostname that will be resolved before dialing. If we do not configure the resolver to
+	// use Tor we will blow any anonymity we gained by using Tor.
+	//
+	// Note you must enter the DNS resolver address that was used when creating the Tor client.
+	//resolver := madns.DefaultResolver // Noop
+	madns.DefaultResolver = onion.NewTorResolver("localhost:2121")
+
+	// Create the libp2p transport option.
+	// Create address option.
+	onionAddr, err := multiaddr.NewMultiaddr(fmt.Sprintf("/onion3/%s:%d", onionService.ID, listenPort))
+	if err != nil {
+		log.WithError(err).Error("Failed to NewMultiaddr onion3")
+		return nil, err
+	}
+
 	return []libp2p.Option{
 		libp2p.Identity(priv),
-
 		libp2p.ListenAddrs(onionAddr),
 		libp2p.Transport(onion.NewOnionTransportC(priv, dialer, onionService)),
-		libp2p.DefaultMuxers,
-		libp2p.DefaultPeerstore,
-
-		libp2p.NoSecurity,
-		libp2p.WithDialTimeout(5 * time.Minute),
-		libp2p.EnableRelay(),
-		libp2p.EnableAutoRelay(),
+		libp2p.DefaultMultiaddrResolver,
+		libp2p.ConnectionManager(mgr),
+		libp2p.Ping(true),
+		libp2p.UserAgent("Soroban"),
 	}, nil
 }

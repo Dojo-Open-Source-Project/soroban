@@ -41,6 +41,10 @@ make soroban
         Onion private key seed
   -withTor
         Hidden service enabled (default false)
+  -statsEndpoint
+        Label used for the RPC API /stats endpoint. Endpoint is deactivated if label is left empty (default "")
+  -statusEndpoint
+        Label used for the RPC API /status endpoint. Endpoint is deactivated if label is left empty (default "")
 ```
 
 ## Confidential keys

@@ -11,16 +11,18 @@ var (
 		LogLevel: "info",
 		LogFile:  "-",
 		Soroban: SorobanInfo{
-			Config:        "",
-			Confidential:  "",
-			Domain:        "samourai",
-			DirectoryType: "default",
-			WithTor:       false,
-			Seed:          "",
-			Hostname:      "localhost",
-			Port:          4242,
-			Announce:      "soroban.announce.nodes",
-			IPv4:          false,
+			Config:         "",
+			Confidential:   "",
+			Domain:         "samourai",
+			DirectoryType:  "default",
+			WithTor:        false,
+			Seed:           "",
+			Hostname:       "localhost",
+			Port:           4242,
+			Announce:       "soroban.announce.nodes",
+			IPv4:           false,
+			StatsEndpoint:  "",
+			StatusEndpoint: "",
 		},
 		P2P: P2PInfo{
 			Seed:          "",
@@ -93,16 +95,18 @@ func (p *Options) Merge(o Options) {
 }
 
 type SorobanInfo struct {
-	Config        string
-	Confidential  string
-	Domain        string
-	DirectoryType string
-	WithTor       bool
-	Seed          string
-	Hostname      string
-	Port          int
-	Announce      string
-	IPv4          bool
+	Config         string
+	Confidential   string
+	Domain         string
+	DirectoryType  string
+	WithTor        bool
+	Seed           string
+	Hostname       string
+	Port           int
+	Announce       string
+	IPv4           bool
+	StatsEndpoint  string
+	StatusEndpoint string
 }
 
 func (p *SorobanInfo) Merge(s SorobanInfo) {
@@ -135,6 +139,12 @@ func (p *SorobanInfo) Merge(s SorobanInfo) {
 	}
 	if s.IPv4 {
 		p.IPv4 = s.IPv4
+	}
+	if len(s.StatsEndpoint) > 0 {
+		p.StatsEndpoint = s.StatsEndpoint
+	}
+	if len(s.StatusEndpoint) > 0 {
+		p.StatusEndpoint = s.StatusEndpoint
 	}
 }
 

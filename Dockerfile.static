@@ -1,5 +1,5 @@
 # build go app
-FROM golang:1.19-alpine3.18 as gobuild
+FROM golang:1.23-alpine3.19 as gobuild
 
 RUN apk --no-cache --update add ca-certificates
 RUN apk --no-cache --update add alpine-sdk linux-headers

@@ -4,7 +4,7 @@
 FROM alpine:3.18 as torproject
 
 ARG TOR_GIT_URL=https://git.torproject.org/tor.git
-ARG TOR_VERSION=tor-0.4.8.7
+ARG TOR_VERSION=tor-0.4.8.13
 
 RUN apk --update --no-cache add ca-certificates
 RUN apk --no-cache add alpine-sdk automake autoconf

@@ -234,14 +234,14 @@ func (p *Soroban) Register(ctx context.Context, name string, receiver soroban.Se
 	return p.rpcServer.RegisterService(receiver, name)
 }
 
-func (p *Soroban) Start(ctx context.Context, hostname string, port int) error {
+func (p *Soroban) Start(ctx context.Context, hostname string, port int, statsLabel string, statusLabel string) error {
 	// start without listener
-	go p.startServer(hostname, port, nil)
+	go p.startServer(hostname, port, nil, statsLabel, statusLabel)
 
 	return nil
 }
 
-func (p *Soroban) StartWithTor(ctx context.Context, hostname string, port int, seed string) error {
+func (p *Soroban) StartWithTor(ctx context.Context, hostname string, port int, seed string, statsLabel string, statusLabel string) error {
 	if p.t == nil {
 		return errors.New("tor not initialized")
 	}
@@ -278,12 +278,12 @@ func (p *Soroban) StartWithTor(ctx context.Context, hostname string, port int, s
 	}
 
 	// start with listener
-	go p.startServer(hostname, port, p.onion)
+	go p.startServer(hostname, port, p.onion, statsLabel, statusLabel)
 
 	return nil
 }
 
-func (p *Soroban) startServer(hostname string, port int, listener net.Listener) {
+func (p *Soroban) startServer(hostname string, port int, listener net.Listener, statsLabel string, statusLabel string) {
 	p.started <- true
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"}, // Use your allowed origin here
@@ -297,9 +297,14 @@ func (p *Soroban) startServer(hostname string, port int, listener net.Listener) 
 
 	router := mux.NewRouter()
 	router.HandleFunc("/rpc", rpcHandler)
-	router.HandleFunc("/stats", stats.StatsHandler)
-	router.HandleFunc("/status", StatusHandler)
-
+	if len(statsLabel) > 0 {
+		router.HandleFunc("/"+statsLabel, stats.StatsHandler)
+		log.Info("RPC API /stats endpoint activated and accessible at: /" + statsLabel)
+	}
+	if len(statusLabel) > 0 {
+		router.HandleFunc("/"+statusLabel, StatusHandler)
+		log.Info("RPC API /status endpoint activated and accessible at: /" + statusLabel)
+	}
 	mainHandler := c.Handler(router)
 
 	if listener != nil {

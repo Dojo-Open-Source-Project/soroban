@@ -52,6 +52,9 @@ func init() {
 	flag.StringVar(&options.Soroban.DirectoryType, "directoryType", options.Soroban.DirectoryType, "Directory Type (default, redis, memory)")
 	flag.StringVar(&options.Soroban.Announce, "announce", options.Soroban.Announce, "Soroban key for node annouce")
 
+	flag.StringVar(&options.Soroban.StatsEndpoint, "statsEndpoint", options.Soroban.StatsEndpoint, "Label of the RPC API /stats endpoint (endpoint deactivated if empty label)")
+	flag.StringVar(&options.Soroban.StatusEndpoint, "statusEndpoint", options.Soroban.StatusEndpoint, "Label of the RPC API /status endpoint (enpoint deactivated if empty label)")
+
 	flag.StringVar(&options.P2P.Seed, "p2pSeed", options.P2P.Seed, "P2P Onion private key seed")
 	flag.StringVar(&options.P2P.Bootstrap, "p2pBootstrap", options.P2P.Bootstrap, "P2P bootstrap")
 	flag.IntVar(&options.P2P.ListenPort, "p2pListenPort", options.P2P.ListenPort, "P2P Listen Port")
@@ -153,9 +156,9 @@ func run() error {
 
 	log.Info("Staring soroban...")
 	if options.Soroban.WithTor {
-		err = sorobanServer.StartWithTor(ctx, options.Soroban.Hostname, options.Soroban.Port, options.Soroban.Seed)
+		err = sorobanServer.StartWithTor(ctx, options.Soroban.Hostname, options.Soroban.Port, options.Soroban.Seed, options.Soroban.StatsEndpoint, options.Soroban.StatusEndpoint)
 	} else {
-		err = sorobanServer.Start(ctx, options.Soroban.Hostname, options.Soroban.Port)
+		err = sorobanServer.Start(ctx, options.Soroban.Hostname, options.Soroban.Port, options.Soroban.StatsEndpoint, options.Soroban.StatusEndpoint)
 	}
 	if err != nil {
 		return err

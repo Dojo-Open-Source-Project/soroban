@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"strings"
 
-	soroban "code.samourai.io/wallet/samourai-soroban"
-	"code.samourai.io/wallet/samourai-soroban/ipc"
+	soroban "soroban"
+	"soroban/ipc"
 
 	log "github.com/sirupsen/logrus"
 )

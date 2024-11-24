@@ -6,10 +6,11 @@ import (
 	"errors"
 	"fmt"
 
-	soroban "code.samourai.io/wallet/samourai-soroban"
-	"code.samourai.io/wallet/samourai-soroban/internal"
-	"code.samourai.io/wallet/samourai-soroban/ipc"
-	"code.samourai.io/wallet/samourai-soroban/p2p"
+	soroban "soroban"
+	"soroban/internal"
+	"soroban/ipc"
+	"soroban/p2p"
+
 	log "github.com/sirupsen/logrus"
 )
 

@@ -14,7 +14,7 @@ RUN go build -a -tags netgo -o /stage/soroban-server ./cmd/server
 
 
 # final image. see docker/tor to build tor base image
-FROM samourai-tor
+FROM soroban-tor
 
 COPY --from=gobuild /stage/soroban-server /usr/local/bin
 

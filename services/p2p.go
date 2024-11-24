@@ -7,9 +7,10 @@ import (
 	"os"
 	"time"
 
-	soroban "code.samourai.io/wallet/samourai-soroban"
-	"code.samourai.io/wallet/samourai-soroban/internal"
-	"code.samourai.io/wallet/samourai-soroban/ipc"
+	soroban "soroban"
+	"soroban/internal"
+	"soroban/ipc"
+
 	log "github.com/sirupsen/logrus"
 )
 

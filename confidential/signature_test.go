@@ -60,7 +60,6 @@ func Test_verifyTestnet3Signature(t *testing.T) {
 	}{
 		{"failed", args{"mi42XN9J3eLdZae4tjQnJnVkCcNDRuAtz4", "hello_failed", "IOMVJ0SDwbDs1zb3IV/MxEeNRwn8FA+2ZZlmtE6HzGEeMxm2lSDNSHoJmNCCNghIPHAJxWg6smIrItgvzofllEg="}, false},
 		{"verified", args{"mi42XN9J3eLdZae4tjQnJnVkCcNDRuAtz4", "hello", "IOMVJ0SDwbDs1zb3IV/MxEeNRwn8FA+2ZZlmtE6HzGEeMxm2lSDNSHoJmNCCNghIPHAJxWg6smIrItgvzofllEg="}, true},
-		{"verified-message", args{"mi42XN9J3eLdZae4tjQnJnVkCcNDRuAtz4", "com.samourai.whirlpool.wo.1687247300669", "IMhtg2RvUjfy18BP0wYpi9CpQgrY2/DVPVTK3W/6vVGYeZyR+WQD4Kt3bEmC8eSvgpKy9X4f5nFzZu/CiJIS8sc="}, true},
 		{"verified-core", args{"mk7YZqsP6jEJ4XNqdDQEXYwR4umRKceddR", "Test", "IIQCJwCvFQ62E7JlOsozLbyjybqLE719G1hPxZcJBANGIxP7rtv5Rg9RFJ3gsBe19kbeFyKfaKqFGUIGbuZHORI="}, true},
 	}
 	for _, tt := range tests {

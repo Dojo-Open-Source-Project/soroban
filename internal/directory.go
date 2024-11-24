@@ -1,8 +1,8 @@
 package internal
 
 import (
-	soroban "code.samourai.io/wallet/samourai-soroban"
-	"code.samourai.io/wallet/samourai-soroban/internal/memory"
+	soroban "soroban"
+	"soroban/internal/memory"
 )
 
 type DirectoryType string

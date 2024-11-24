@@ -1,4 +1,4 @@
-module code.samourai.io/wallet/samourai-soroban
+module soroban
 
 go 1.22
 

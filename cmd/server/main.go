@@ -11,10 +11,10 @@ import (
 	"syscall"
 	"time"
 
-	soroban "code.samourai.io/wallet/samourai-soroban"
-	"code.samourai.io/wallet/samourai-soroban/server"
+	soroban "soroban"
+	"soroban/server"
 
-	"code.samourai.io/wallet/samourai-soroban/services"
+	"soroban/services"
 
 	log "github.com/sirupsen/logrus"
 )

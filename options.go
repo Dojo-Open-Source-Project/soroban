@@ -13,7 +13,7 @@ var (
 		Soroban: SorobanInfo{
 			Config:         "",
 			Confidential:   "",
-			Domain:         "samourai",
+			Domain:         "soroban",
 			DirectoryType:  "default",
 			WithTor:        false,
 			Seed:           "",
@@ -30,7 +30,7 @@ var (
 			ListenPort:    1042,
 			LowWater:      16, // = 2*Gossip.Dlo
 			HighWater:     40, // = 2*Gossip.Dhi
-			Room:          "samourai-p2p",
+			Room:          "soroban-p2p",
 			DHTServerMode: false,
 			PeerstoreFile: "-",
 		},

@@ -11,10 +11,10 @@ soroban:
 	cd bin && sha256sum soroban-server | tee soroban-server.sum && cd ..
 
 docker:
-	docker build -t samourai-soroban .
+	docker build -t soroban .
 
 docker-static:
-	docker build -t samourai-soroban-static . -f Dockerfile.static
+	docker build -t soroban-static . -f Dockerfile.static
 
 compose-build:
 	docker-compose build

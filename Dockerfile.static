@@ -13,7 +13,7 @@ RUN go build -a -tags netgo -ldflags '-w -extldflags "-static"' -o /stage/soroba
 
 
 # final image
-FROM samourai-tor-static
+FROM soroban-tor-static
 
 COPY --from=gobuild /stage/soroban-server /usr/local/bin
 

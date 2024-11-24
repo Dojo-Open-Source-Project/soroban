@@ -3,8 +3,8 @@ package server
 import (
 	"errors"
 
-	soroban "code.samourai.io/wallet/samourai-soroban"
-	"code.samourai.io/wallet/samourai-soroban/services"
+	soroban "soroban"
+	"soroban/services"
 )
 
 func addToDirectory(directory soroban.Directory, args *services.DirectoryEntry) error {

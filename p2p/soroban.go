@@ -15,7 +15,8 @@ import (
 	"strings"
 	"time"
 
-	soroban "code.samourai.io/wallet/samourai-soroban"
+	soroban "soroban"
+
 	"github.com/libp2p/go-libp2p"
 	dht "github.com/libp2p/go-libp2p-kad-dht"
 	pubsub "github.com/libp2p/go-libp2p-pubsub"
@@ -128,7 +129,7 @@ func (p *P2P) Start(ctx context.Context, optionsP2P soroban.P2PInfo, optionsGoss
 	}
 
 	log.Debugf("isBootstrap: %t", isBoostrapNode)
-	log.Debugf("DHT mode: %s", mode)
+	log.Debugf("DHT mode: %v", mode)
 
 	// Connect node to a few peers persisted on disk
 	if !isBoostrapNode && optionsP2P.PeerstoreFile != "-" {

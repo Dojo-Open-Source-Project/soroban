@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"io"
 
-	soroban "code.samourai.io/wallet/samourai-soroban"
-	"code.samourai.io/wallet/samourai-soroban/p2p/onion"
+	soroban "soroban"
+	"soroban/p2p/onion"
 
 	"github.com/cretz/bine/tor"
 	"github.com/libp2p/go-libp2p"

@@ -11,40 +11,82 @@ make soroban
 ## Usage
 
 ```bash
-  -directoryHostname string
-        Directory host
-  -directoryPort int
-        Directory host
+  -announce string
+        Soroban key for node annouce (default "soroban.announce.nodes")
+  -confidential string
+        Yaml configuration file for confidential keys
+  -config string
+        Yaml configuration file for soroban
   -directoryType string
-        Directory Type (default, redis, memory)
+        Directory Type (default, redis, memory) (default "default")
   -domain string
-        Directory Domain
+        Directory Domain (default "soroban")
   -export string
         Export hidden service secret key from seed to file
+  -genCount int
+        Limit generated keys (0 for no limits) (default 10)
+  -gossipD int
+        Gossip D (default 10)
+  -gossipDhi int
+        Gossip Dhi (default 20)
+  -gossipDlazy int
+        Gossip Dlazy (default 10)
+  -gossipDlo int
+        Gossip Dlo (default 8)
+  -gossipDout int
+        Gossip Dout (default 5)
+  -gossipDscore int
+        Gossip Dscore (default 7)
+  -gossipLimit int
+        Gossip Limit (default 40)
+  -gossipPrunePeers int
+        Gossip PrunePeers (default 40)
   -hostname string
         server address (default localhost) (default "localhost")
+  -ipcChildID int
+        IPC child ID
+  -ipcChildProcessCount int
+        Spawn child process
+  -ipcNatsHost string
+        IPC NATS host (default "localhost")
+  -ipcNatsPort int
+        IPC nats port (default 4322)
+  -ipcSubject string
+        IPC communication subject (default "ipc.server")
   -log string
         Log level (default info) (default "info")
+  -logfile string
+        Log file (default -) (default "-")
   -p2pBootstrap string
         P2P bootstrap
+  -p2pDHTServerMode
+        P2P DHT Server Mode
+  -p2pHighWater int
+        P2P Connection High Watermark (default 40)
   -p2pListenPort int
         P2P Listen Port (default 1042)
+  -p2pLowWater int
+        P2P Connection Low Watermark (default 16)
+  -p2pPeerstoreFile string
+        Peerstore file (default -) (default "-")
   -p2pRoom string
-        P2P Room (default "samourai")
+        P2P Room (default "soroban-p2p")
   -p2pSeed string
-        P2P Onion private key seed (default "auto")
+        P2P Onion private key seed
   -port int
         Server port (default 4242) (default 4242)
   -prefix string
         Generate Onion with prefix
   -seed string
         Onion private key seed
+  -statsEndpoint string
+        Label of the RPC API /stats endpoint (endpoint deactivated if empty label)
+  -statusEndpoint string
+        Label of the RPC API /status endpoint (enpoint deactivated if empty label)
+  -version
+        Print version and exit
   -withTor
         Hidden service enabled (default false)
-  -statsEndpoint
-        Label used for the RPC API /stats endpoint. Endpoint is deactivated if label is left empty (default "")
-  -statusEndpoint
-        Label used for the RPC API /status endpoint. Endpoint is deactivated if label is left empty (default "")
 ```
 
 ## Confidential keys

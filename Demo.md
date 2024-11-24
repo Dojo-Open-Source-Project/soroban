@@ -1,18 +1,18 @@
 # P2P Demo
 
-## Soroban default room (samourai)
+## Soroban default room
 
 - Start 3 soroban servers (4242, 4243, 4244)
 
 ```
 # 4242
-go run ./cmd/server --p2pBootstrap=/ip4/164.68.108.59/tcp/1042/p2p/16Uiu2HAmLh9dzKen97hWAkEoRawFVQq2j1Lba56tNeoDstpzUZS4 --p2pRoom=samourai --port=4242
+go run ./cmd/server --p2pBootstrap=/ip4/164.68.108.59/tcp/1042/p2p/16Uiu2HAmLh9dzKen97hWAkEoRawFVQq2j1Lba56tNeoDstpzUZS4 --p2pRoom=soroban --port=4242
 
 # 4243
-go run ./cmd/server --p2pBootstrap=/ip4/164.68.108.59/tcp/1042/p2p/16Uiu2HAmLh9dzKen97hWAkEoRawFVQq2j1Lba56tNeoDstpzUZS4 --p2pRoom=samourai --port=4243
+go run ./cmd/server --p2pBootstrap=/ip4/164.68.108.59/tcp/1042/p2p/16Uiu2HAmLh9dzKen97hWAkEoRawFVQq2j1Lba56tNeoDstpzUZS4 --p2pRoom=soroban --port=4243
 
 # 4244
-go run ./cmd/server --p2pBootstrap=/ip4/164.68.108.59/tcp/1042/p2p/16Uiu2HAmLh9dzKen97hWAkEoRawFVQq2j1Lba56tNeoDstpzUZS4 --p2pRoom=samourai --port=4244
+go run ./cmd/server --p2pBootstrap=/ip4/164.68.108.59/tcp/1042/p2p/16Uiu2HAmLh9dzKen97hWAkEoRawFVQq2j1Lba56tNeoDstpzUZS4 --p2pRoom=soroban --port=4244
 ```
 
 - List from first soroban server (4242)
@@ -48,19 +48,19 @@ curl -s -X POST  -H 'Content-Type: application/json' -d '{ "jsonrpc": "2.0", "id
 ```
 
 
-## Soroban private room (samourai-wallet)
+## Soroban private room
 
 Start 3 soroban private servers (4201, 4202, 4203)
 
 ```
 # 4201
-go run ./cmd/server --p2pBootstrap=/ip4/164.68.108.59/tcp/1042/p2p/16Uiu2HAmLh9dzKen97hWAkEoRawFVQq2j1Lba56tNeoDstpzUZS4 --p2pRoom=samourai-wallet --port=4201
+go run ./cmd/server --p2pBootstrap=/ip4/164.68.108.59/tcp/1042/p2p/16Uiu2HAmLh9dzKen97hWAkEoRawFVQq2j1Lba56tNeoDstpzUZS4 --p2pRoom=soroban --port=4201
 
 # 4202
-go run ./cmd/server --p2pBootstrap=/ip4/164.68.108.59/tcp/1042/p2p/16Uiu2HAmLh9dzKen97hWAkEoRawFVQq2j1Lba56tNeoDstpzUZS4 --p2pRoom=samourai-wallet --port=4202
+go run ./cmd/server --p2pBootstrap=/ip4/164.68.108.59/tcp/1042/p2p/16Uiu2HAmLh9dzKen97hWAkEoRawFVQq2j1Lba56tNeoDstpzUZS4 --p2pRoom=soroban --port=4202
 
 4203
-go run ./cmd/server --p2pBootstrap=/ip4/164.68.108.59/tcp/1042/p2p/16Uiu2HAmLh9dzKen97hWAkEoRawFVQq2j1Lba56tNeoDstpzUZS4 --p2pRoom=samourai-wallet --port=4203
+go run ./cmd/server --p2pBootstrap=/ip4/164.68.108.59/tcp/1042/p2p/16Uiu2HAmLh9dzKen97hWAkEoRawFVQq2j1Lba56tNeoDstpzUZS4 --p2pRoom=soroban --port=4203
 ```
 
 

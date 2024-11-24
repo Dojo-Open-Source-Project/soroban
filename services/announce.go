@@ -6,7 +6,8 @@ import (
 	"net/http"
 	"time"
 
-	"code.samourai.io/wallet/samourai-soroban/internal"
+	"soroban/internal"
+
 	log "github.com/sirupsen/logrus"
 )
 

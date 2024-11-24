@@ -14,12 +14,12 @@ import (
 	"crypto/ed25519"
 	"crypto/rand"
 
-	soroban "code.samourai.io/wallet/samourai-soroban"
-	"code.samourai.io/wallet/samourai-soroban/confidential"
-	"code.samourai.io/wallet/samourai-soroban/internal"
-	"code.samourai.io/wallet/samourai-soroban/ipc"
-	"code.samourai.io/wallet/samourai-soroban/p2p"
-	"code.samourai.io/wallet/samourai-soroban/services"
+	soroban "soroban"
+	"soroban/confidential"
+	"soroban/internal"
+	"soroban/ipc"
+	"soroban/p2p"
+	"soroban/services"
 
 	"github.com/cretz/bine/tor"
 	"github.com/gorilla/mux"

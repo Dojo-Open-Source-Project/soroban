@@ -1,15 +1,15 @@
 all: docker
 
 docker:
-	docker build -t samourai-tor .
+	docker build -t soroban-tor .
 
 docker-static:
-	docker build -t samourai-tor-static . -f Dockerfile.static
+	docker build -t soroban-tor-static . -f Dockerfile.static
 
 run:
-	docker run samourai-tor
+	docker run soroban-tor
 
 run-static:
-	docker run samourai-tor-static
+	docker run soroban-tor-static
 
 .PHONY: docker run

@@ -4,7 +4,7 @@ services:
     build: .
     restart: always
     command: [
-      "--domain=samourai",
+      "--domain=soroban",
       "-withTor",
       "--seed=5baa80270886506c6b080de4e9558e2c32c50d3a7633f87d8396f5d5767e988d",
     ]

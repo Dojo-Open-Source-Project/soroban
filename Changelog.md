@@ -1,5 +1,13 @@
 # Soroban Changelog
 
+## [v0.4.0] - 2024-11-24
+
+- Improve Scalability
+- Remove clear web support
+- Make monitoring endpoints optionals
+- Remove samourai references
+- Update libp2p (v0.33.2)
+
 ## [v0.3.2] - 2024-06-15
 
 - Add Stats endpoints

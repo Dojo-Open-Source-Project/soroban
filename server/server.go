@@ -12,13 +12,14 @@ import (
 
 	"crypto"
 	"crypto/ed25519"
+	"crypto/rand"
 
-	soroban "code.samourai.io/wallet/samourai-soroban"
-	"code.samourai.io/wallet/samourai-soroban/confidential"
-	"code.samourai.io/wallet/samourai-soroban/internal"
-	"code.samourai.io/wallet/samourai-soroban/ipc"
-	"code.samourai.io/wallet/samourai-soroban/p2p"
-	"code.samourai.io/wallet/samourai-soroban/services"
+	soroban "soroban"
+	"soroban/confidential"
+	"soroban/internal"
+	"soroban/ipc"
+	"soroban/p2p"
+	"soroban/services"
 
 	"github.com/cretz/bine/tor"
 	"github.com/gorilla/mux"
@@ -65,7 +66,12 @@ func New(ctx context.Context, options soroban.Options) (context.Context, *Soroba
 	}
 
 	ctx = context.WithValue(ctx, internal.SorobanDirectoryKey, directory)
-	ctx = context.WithValue(ctx, internal.SorobanP2PKey, &p2p.P2P{OnMessage: make(chan p2p.Message)})
+
+	ctx = context.WithValue(ctx, internal.SorobanP2PKey, &p2p.P2P{
+		OnMessage: make(chan p2p.Message),
+		ChildID:   options.IPC.ChildID,
+	})
+
 	if options.IPC.ChildProcessCount > 0 || options.IPC.ChildID > 0 {
 		ctx = context.WithValue(ctx, internal.SorobanIPCKey, ipc.New(ctx, ipc.IPCOptions{
 			Mode:     ipcMode,
@@ -168,7 +174,7 @@ func New(ctx context.Context, options soroban.Options) (context.Context, *Soroba
 		}
 
 		ready := make(chan struct{})
-		go services.StartP2PDirectory(ctx, options.P2P.Seed, options.P2P.Bootstrap, options.P2P.Hostname, options.P2P.ListenPort, options.P2P.Room, ready)
+		go services.StartP2PDirectory(ctx, options, ready)
 		<-ready
 		log.Info("P2PDirectory service started")
 	}
@@ -228,17 +234,26 @@ func (p *Soroban) Register(ctx context.Context, name string, receiver soroban.Se
 	return p.rpcServer.RegisterService(receiver, name)
 }
 
-func (p *Soroban) Start(ctx context.Context, hostname string, port int) error {
+func (p *Soroban) Start(ctx context.Context, hostname string, port int, statsLabel string, statusLabel string) error {
 	// start without listener
-	go p.startServer(hostname, port, nil)
+	go p.startServer(hostname, port, nil, statsLabel, statusLabel)
 
 	return nil
 }
 
-func (p *Soroban) StartWithTor(ctx context.Context, hostname string, port int, seed string) error {
+func (p *Soroban) StartWithTor(ctx context.Context, hostname string, port int, seed string, statsLabel string, statusLabel string) error {
 	if p.t == nil {
 		return errors.New("tor not initialized")
 	}
+
+	if len(seed) == 0 {
+		_, pri, err := ed25519.GenerateKey(rand.Reader)
+		if err != nil {
+			log.Fatal(err)
+		}
+		seed = hex.EncodeToString(pri.Seed())
+	}
+
 	var key crypto.PrivateKey
 	if len(seed) > 0 {
 		str, err := hex.DecodeString(seed)
@@ -263,12 +278,12 @@ func (p *Soroban) StartWithTor(ctx context.Context, hostname string, port int, s
 	}
 
 	// start with listener
-	go p.startServer(hostname, port, p.onion)
+	go p.startServer(hostname, port, p.onion, statsLabel, statusLabel)
 
 	return nil
 }
 
-func (p *Soroban) startServer(hostname string, port int, listener net.Listener) {
+func (p *Soroban) startServer(hostname string, port int, listener net.Listener, statsLabel string, statusLabel string) {
 	p.started <- true
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"}, // Use your allowed origin here
@@ -282,9 +297,14 @@ func (p *Soroban) startServer(hostname string, port int, listener net.Listener) 
 
 	router := mux.NewRouter()
 	router.HandleFunc("/rpc", rpcHandler)
-	router.HandleFunc("/stats", stats.StatsHandler)
-	router.HandleFunc("/status", StatusHandler)
-
+	if len(statsLabel) > 0 {
+		router.HandleFunc("/"+statsLabel, stats.StatsHandler)
+		log.Info("RPC API /stats endpoint activated and accessible at: /" + statsLabel)
+	}
+	if len(statusLabel) > 0 {
+		router.HandleFunc("/"+statusLabel, StatusHandler)
+		log.Info("RPC API /status endpoint activated and accessible at: /" + statusLabel)
+	}
 	mainHandler := c.Handler(router)
 
 	if listener != nil {

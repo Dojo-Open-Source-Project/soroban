@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strings"
 
-	soroban "code.samourai.io/wallet/samourai-soroban"
-	"code.samourai.io/wallet/samourai-soroban/internal"
+	soroban "soroban"
+	"soroban/internal"
 )
 
 func StatusHandler(w http.ResponseWriter, r *http.Request) {

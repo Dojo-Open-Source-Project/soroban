@@ -1,7 +1,7 @@
 version: '3'
 services:
   torproxy:
-    image: samourai-tor
+    image: soroban-tor
     command: [
         "-f", "/usr/local/etc/tor/torrc.socks"
     ]
@@ -15,7 +15,7 @@ services:
     command: [
         "-e",
         "--with_tor=torproxy:9150",
-        "--directory_name=samourai.soroban.docker",
+        "--directory_name=soroban.docker",
         "--url=http://sorzvujomsfbibm7yo3k52f3t2bl6roliijnm7qql43bcoe2kxwhbcyd.onion",
         "--role=initiator",
     ]
@@ -28,7 +28,7 @@ services:
     command: [
         "-e",
         "--with_tor=torproxy:9150",
-        "--directory_name=samourai.soroban.docker",
+        "--directory_name=soroban.docker",
         "--url=http://sorzvujomsfbibm7yo3k52f3t2bl6roliijnm7qql43bcoe2kxwhbcyd.onion",
         "--role=contributor",
     ]

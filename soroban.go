@@ -12,8 +12,8 @@ type Service interface{}
 type Soroban interface {
 	ID() string
 	Register(ctx context.Context, name string, service Service) error
-	Start(ctx context.Context, hostname string, port int) error
-	StartWithTor(ctx context.Context, hostname string, port int, seed string) error
+	Start(ctx context.Context, hostname string, port int, statsLabel string, statusLabel string) error
+	StartWithTor(ctx context.Context, hostname string, port int, seed string, statsLabel string, statusLabel string) error
 	Stop(ctx context.Context)
 	WaitForStart(ctx context.Context)
 }

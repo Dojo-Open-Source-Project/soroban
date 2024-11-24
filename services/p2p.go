@@ -7,18 +7,19 @@ import (
 	"os"
 	"time"
 
-	soroban "code.samourai.io/wallet/samourai-soroban"
-	"code.samourai.io/wallet/samourai-soroban/internal"
-	"code.samourai.io/wallet/samourai-soroban/ipc"
+	soroban "soroban"
+	"soroban/internal"
+	"soroban/ipc"
+
 	log "github.com/sirupsen/logrus"
 )
 
-func StartP2PDirectory(ctx context.Context, p2pSeed, bootstrap string, hostname string, listenPort int, room string, ready chan struct{}) {
-	if len(bootstrap) == 0 {
+func StartP2PDirectory(ctx context.Context, options soroban.Options, ready chan struct{}) {
+	if len(options.P2P.Bootstrap) == 0 {
 		log.Error("Invalid bootstrap")
 		return
 	}
-	if len(room) == 0 {
+	if len(options.P2P.Room) == 0 {
 		log.Error("Invalid room")
 		return
 	}
@@ -37,7 +38,7 @@ func StartP2PDirectory(ctx context.Context, p2pSeed, bootstrap string, hostname 
 
 	p2pReady := make(chan struct{})
 	go func() {
-		err := p2P.Start(ctx, p2pSeed, hostname, listenPort, bootstrap, room, p2pReady)
+		err := p2P.Start(ctx, options.P2P, options.Gossip, p2pReady)
 		if err != nil {
 			log.WithError(err).Error("Failed to p2P.Start")
 		}

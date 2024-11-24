@@ -3,9 +3,9 @@ package internal
 import (
 	"context"
 
-	soroban "code.samourai.io/wallet/samourai-soroban"
-	"code.samourai.io/wallet/samourai-soroban/ipc"
-	"code.samourai.io/wallet/samourai-soroban/p2p"
+	soroban "soroban"
+	"soroban/ipc"
+	"soroban/p2p"
 )
 
 type ContextKey string

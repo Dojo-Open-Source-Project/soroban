@@ -3,13 +3,13 @@ logfile: /var/log/soroban.log
 soroban:
   config: /etc/soroban/soroban.yml
   confidential: /etc/soroban/confidential.yml
-  domain: samourai
+  domain: soroban
   withtor: true
   seed: b326ba05f26fb40978a378b1fc6f28d1318ba9b5fdfd0f4bfc6594de76706e81
   hostname: localhost
   port: 4242
 p2p:
-  room: prod-samourai-whilrpool
+  room: soroban-pool
   hostname: ""
   listenport: 1042
   bootstrap: "/onion3/b6jza7z6dil564arui6gev4fmzzrppng62ixjyh66xn7fl227igs56id:1040/p2p/16Uiu2HAmKrVASuXgi7NsJZuVYu2Xqx82NkGewcfEuHKZuHq7adjB"

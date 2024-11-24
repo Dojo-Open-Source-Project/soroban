@@ -1,4 +1,4 @@
-# Samourai tor docker image
+# Soroban tor docker image
 
 Build static tor binaries and create minimal docker image.
 Image contains updated ssl certifcates.

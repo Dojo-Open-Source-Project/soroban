@@ -4,7 +4,8 @@ import (
 	"context"
 	"errors"
 
-	soroban "code.samourai.io/wallet/samourai-soroban"
+	soroban "soroban"
+
 	log "github.com/sirupsen/logrus"
 )
 

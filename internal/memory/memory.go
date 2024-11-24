@@ -4,8 +4,8 @@ import (
 	"sync"
 	"time"
 
-	soroban "code.samourai.io/wallet/samourai-soroban"
-	"code.samourai.io/wallet/samourai-soroban/internal/common"
+	soroban "soroban"
+	"soroban/internal/common"
 
 	"github.com/shaj13/libcache"
 	_ "github.com/shaj13/libcache/arc"
@@ -23,7 +23,7 @@ type Memory struct {
 }
 
 func New(count int, ttl time.Duration) *Memory {
-	return NewWithDomain("samourai", count, ttl)
+	return NewWithDomain("soroban", count, ttl)
 }
 
 func NewWithDomain(domain string, count int, ttl time.Duration) *Memory {

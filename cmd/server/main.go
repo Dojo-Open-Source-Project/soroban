@@ -11,10 +11,10 @@ import (
 	"syscall"
 	"time"
 
-	soroban "code.samourai.io/wallet/samourai-soroban"
-	"code.samourai.io/wallet/samourai-soroban/server"
+	soroban "soroban"
+	"soroban/server"
 
-	"code.samourai.io/wallet/samourai-soroban/services"
+	"soroban/services"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -52,11 +52,26 @@ func init() {
 	flag.StringVar(&options.Soroban.DirectoryType, "directoryType", options.Soroban.DirectoryType, "Directory Type (default, redis, memory)")
 	flag.StringVar(&options.Soroban.Announce, "announce", options.Soroban.Announce, "Soroban key for node annouce")
 
+	flag.StringVar(&options.Soroban.StatsEndpoint, "statsEndpoint", options.Soroban.StatsEndpoint, "Label of the RPC API /stats endpoint (endpoint deactivated if empty label)")
+	flag.StringVar(&options.Soroban.StatusEndpoint, "statusEndpoint", options.Soroban.StatusEndpoint, "Label of the RPC API /status endpoint (enpoint deactivated if empty label)")
+
 	flag.StringVar(&options.P2P.Seed, "p2pSeed", options.P2P.Seed, "P2P Onion private key seed")
 	flag.StringVar(&options.P2P.Bootstrap, "p2pBootstrap", options.P2P.Bootstrap, "P2P bootstrap")
-	flag.StringVar(&options.P2P.Hostname, "p2pHostname", options.P2P.Hostname, "P2P Hostname")
 	flag.IntVar(&options.P2P.ListenPort, "p2pListenPort", options.P2P.ListenPort, "P2P Listen Port")
+	flag.IntVar(&options.P2P.LowWater, "p2pLowWater", options.P2P.LowWater, "P2P Connection Low Watermark")
+	flag.IntVar(&options.P2P.HighWater, "p2pHighWater", options.P2P.HighWater, "P2P Connection High Watermark")
 	flag.StringVar(&options.P2P.Room, "p2pRoom", options.P2P.Room, "P2P Room")
+	flag.BoolVar(&options.P2P.DHTServerMode, "p2pDHTServerMode", options.P2P.DHTServerMode, "P2P DHT Server Mode")
+	flag.StringVar(&options.P2P.PeerstoreFile, "p2pPeerstoreFile", options.P2P.PeerstoreFile, "Peerstore file (default -)")
+
+	flag.IntVar(&options.Gossip.D, "gossipD", options.Gossip.D, "Gossip D")
+	flag.IntVar(&options.Gossip.Dlo, "gossipDlo", options.Gossip.Dlo, "Gossip Dlo")
+	flag.IntVar(&options.Gossip.Dhi, "gossipDhi", options.Gossip.Dhi, "Gossip Dhi")
+	flag.IntVar(&options.Gossip.Dout, "gossipDout", options.Gossip.Dout, "Gossip Dout")
+	flag.IntVar(&options.Gossip.Dscore, "gossipDscore", options.Gossip.Dscore, "Gossip Dscore")
+	flag.IntVar(&options.Gossip.Dlazy, "gossipDlazy", options.Gossip.Dlazy, "Gossip Dlazy")
+	flag.IntVar(&options.Gossip.PrunePeers, "gossipPrunePeers", options.Gossip.PrunePeers, "Gossip PrunePeers")
+	flag.IntVar(&options.Gossip.Limit, "gossipLimit", options.Gossip.Limit, "Gossip Limit")
 
 	flag.StringVar(&options.IPC.Subject, "ipcSubject", options.IPC.Subject, "IPC communication subject")
 	flag.IntVar(&options.IPC.ChildID, "ipcChildID", options.IPC.ChildID, "IPC child ID")
@@ -141,9 +156,9 @@ func run() error {
 
 	log.Info("Staring soroban...")
 	if options.Soroban.WithTor {
-		err = sorobanServer.StartWithTor(ctx, options.Soroban.Hostname, options.Soroban.Port, options.Soroban.Seed)
+		err = sorobanServer.StartWithTor(ctx, options.Soroban.Hostname, options.Soroban.Port, options.Soroban.Seed, options.Soroban.StatsEndpoint, options.Soroban.StatusEndpoint)
 	} else {
-		err = sorobanServer.Start(ctx, options.Soroban.Hostname, options.Soroban.Port)
+		err = sorobanServer.Start(ctx, options.Soroban.Hostname, options.Soroban.Port, options.Soroban.StatsEndpoint, options.Soroban.StatusEndpoint)
 	}
 	if err != nil {
 		return err

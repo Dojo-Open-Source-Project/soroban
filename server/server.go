@@ -288,7 +288,7 @@ func (p *Soroban) startServer(hostname string, port int, listener net.Listener, 
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"}, // Use your allowed origin here
 		AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
-		AllowedHeaders:   []string{"Content-Type", "Authorization"},
+		AllowedHeaders:   []string{"Content-Type", "Authorization", "User-Agent"},
 		AllowCredentials: true,
 	})
 

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+  <meta charset="UTF-8"/>
+  <title>INITIATOR</title>
+  <script src="lib/nacl_factory.js"></script>
+  <script src="lib/soroban-client-lib.js"></script>
+  <script src="user.js"></script>
+  <script src="soroban-client.js"></script>
+</head>
+
+<body>
+  <h1>Initiator</h1>
+  <h2>URL of Soroban RPC API</h2>
+  <input id="url" type="text" value="http://localhost:4242/rpc">
+  <button type="button" onclick="start()">START</button>
+  <h2>Logs</h2>
+  <div id="logs"></div>
+</body>
+
+<script type="text/javascript">
+  async function start() {
+    const url = document.querySelector('#url').value 
+    if (url != '') {
+      try {
+        const numIter = 3
+        const role = 'initiator'
+        const directoryName = await encodeDirectory('test')
+    
+        const client = new RPC(url)
+
+        while (true) {
+          await initiator(url, directoryName, true, client, numIter)
+          console.log('Done')
+        }
+      } catch (e) {
+        console.log(`Error: ${e}`)
+      }
+    } else {
+      alert('URL of a Soroban RPC API is required')
+    }
+  }
+</script>
+
+</html>

@@ -1,0 +1,37 @@
+version: '3'
+services:
+  torproxy:
+    container_name: "torproxy"
+    image: soroban-tor
+    command: [
+        "-f", "/usr/local/etc/tor/torrc.socks"
+    ]
+    restart: always
+
+  initiator:
+    container_name: "initiator"
+    build: .
+    restart: always
+    links:
+      - torproxy
+    command: [
+        "-e",
+        "--with_tor=http://torproxy:9050",
+        "--directory_name=soroban.docker",
+        "--url=http://sorg3sf2lxhd6swneuuzvo7jluuassw5qsxakzgimr5agvkj35265gad.onion/rpc",
+        "--role=initiator",
+    ]
+
+  contributor:
+    container_name: "contributor"
+    build: .
+    restart: always
+    links:
+      - torproxy
+    command: [
+        "-e",
+        "--with_tor=http://torproxy:9050",
+        "--directory_name=soroban.docker",
+        "--url=http://sorg3sf2lxhd6swneuuzvo7jluuassw5qsxakzgimr5agvkj35265gad.onion/rpc",
+        "--role=contributor",
+    ]

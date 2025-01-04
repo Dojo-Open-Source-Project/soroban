@@ -1,0 +1,20 @@
+{
+  "name": "js-node",
+  "version": "1.0.0",
+  "main": "demo.js",
+  "type": "module",
+  "scripts": {
+    "test": "mocha --recursive --reporter spec"
+  },
+  "keywords": [],
+  "author": "LaurentMT",
+  "license": "AGPL-3.0-only",
+  "description": "",
+  "dependencies": {
+    "js-nacl": "1.4.0",
+    "soroban-client-nodejs": "1.0.0"
+  },
+  "devDependencies": {
+    "mocha": "^10.7.3"
+  }
+}

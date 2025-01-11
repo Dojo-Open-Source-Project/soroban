@@ -65,7 +65,7 @@ async function initiator(url, directoryName, hashEncode, rpc, numIter) {
       log('Invalid reponse message')
       return
     }
-    log(`Recieved: ${msg}`)
+    log(`Received: ${msg}`)
     counter += 1
     numIter -= 1
   }

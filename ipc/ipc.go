@@ -100,7 +100,7 @@ func (p *IPCService) ListenFromServer(ctx context.Context, ipcSubject string, ip
 	log.WithField("subject", subject).Info("Child register for server requests")
 	for i := 0; i < 16; i++ {
 		sub, err := p.conn.QueueSubscribe(subject, "queue."+subject, func(msg *nats.Msg) {
-			log.Warning("Message recieved from IPC server")
+			log.Warning("Message received from IPC server")
 			handleNatsMessage(ctx, msg, ipcHandler)
 		})
 		if err != nil {

@@ -154,7 +154,7 @@ func run() error {
 		log.Fatalf("%v", err)
 	}
 
-	log.Info("Staring soroban...")
+	log.Info("Starting soroban...")
 	if options.Soroban.WithTor {
 		err = sorobanServer.StartWithTor(ctx, options.Soroban.Hostname, options.Soroban.Port, options.Soroban.Seed, options.Soroban.StatsEndpoint, options.Soroban.StatusEndpoint)
 	} else {

@@ -64,7 +64,7 @@ async function initiator(url, directoryName, hashEncode, rpc, numIter) {
       console.log('Invalid reponse message')
       return
     }
-    console.log(`Recieved: ${msg}`)
+    console.log(`Received: ${msg}`)
     counter += 1
     numIter -= 1
   }

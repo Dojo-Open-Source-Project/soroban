@@ -170,12 +170,9 @@ func run() error {
 
 	if len(sorobanServer.ID()) != 0 {
 		if options.Soroban.OnionFile != "-" {
-			file, err := os.Create(options.Soroban.OnionFile)
-			if err != nil {
+			if err := exportHostname(sorobanServer.ID()); err != nil {
 				return err
 			}
-			defer file.Close()
-			file.Write([]byte(sorobanServer.ID()))
 			log.Infof("Wrote hostname on disk")
 		}
 		log.Infof("Soroban started: http://%s.onion", sorobanServer.ID())
@@ -200,6 +197,22 @@ func run() error {
 	}
 
 	<-ctx.Done()
+	return nil
+}
+
+func exportHostname(hostname string) error {
+	file, err := os.Create(options.Soroban.OnionFile)
+	if err != nil {
+		return err
+	}
+
+	defer file.Close()
+
+	_, err = file.Write([]byte(hostname))
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

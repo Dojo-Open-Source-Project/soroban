@@ -46,6 +46,7 @@ func init() {
 	flag.StringVar(&options.Soroban.Seed, "seed", options.Soroban.Seed, "Onion private key seed")
 
 	flag.BoolVar(&options.Soroban.WithTor, "withTor", options.Soroban.WithTor, "Hidden service enabled (default false)")
+	flag.StringVar(&options.Soroban.OnionFile, "onionFile", options.Soroban.OnionFile, "Hidden service hostname file (default -)")
 	flag.StringVar(&options.Soroban.Hostname, "hostname", options.Soroban.Hostname, "server address (default localhost)")
 	flag.IntVar(&options.Soroban.Port, "port", options.Soroban.Port, "Server port (default 4242)")
 
@@ -154,7 +155,7 @@ func run() error {
 		log.Fatalf("%v", err)
 	}
 
-	log.Info("Staring soroban...")
+	log.Info("Starting soroban...")
 	if options.Soroban.WithTor {
 		err = sorobanServer.StartWithTor(ctx, options.Soroban.Hostname, options.Soroban.Port, options.Soroban.Seed, options.Soroban.StatsEndpoint, options.Soroban.StatusEndpoint)
 	} else {
@@ -168,6 +169,12 @@ func run() error {
 	sorobanServer.WaitForStart(ctx)
 
 	if len(sorobanServer.ID()) != 0 {
+		if options.Soroban.OnionFile != "-" {
+			if err := exportHostname(sorobanServer.ID()); err != nil {
+				return err
+			}
+			log.Infof("Wrote hostname on disk")
+		}
 		log.Infof("Soroban started: http://%s.onion", sorobanServer.ID())
 	}
 	if !options.Soroban.WithTor || (options.Soroban.IPv4 && options.Soroban.Hostname != "0.0.0.0") {
@@ -190,6 +197,22 @@ func run() error {
 	}
 
 	<-ctx.Done()
+	return nil
+}
+
+func exportHostname(hostname string) error {
+	file, err := os.Create(options.Soroban.OnionFile)
+	if err != nil {
+		return err
+	}
+
+	defer file.Close()
+
+	_, err = file.Write([]byte(hostname))
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

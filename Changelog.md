@@ -1,5 +1,11 @@
 # Soroban Changelog
 
+## [v0.4.1] - 2025-03-08
+
+- Add JS clients
+- Export RPC hostname
+- Fix CORS Headers
+
 ## [v0.4.0] - 2024-11-24
 
 - Improve Scalability

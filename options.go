@@ -16,6 +16,7 @@ var (
 			Domain:         "soroban",
 			DirectoryType:  "default",
 			WithTor:        false,
+			OnionFile:      "-",
 			Seed:           "",
 			Hostname:       "localhost",
 			Port:           4242,
@@ -100,6 +101,7 @@ type SorobanInfo struct {
 	Domain         string
 	DirectoryType  string
 	WithTor        bool
+	OnionFile      string
 	Seed           string
 	Hostname       string
 	Port           int
@@ -124,6 +126,9 @@ func (p *SorobanInfo) Merge(s SorobanInfo) {
 	}
 	if s.WithTor {
 		p.WithTor = s.WithTor
+	}
+	if len(s.OnionFile) > 0 {
+		p.OnionFile = s.OnionFile
 	}
 	if len(s.Seed) > 0 {
 		p.Seed = s.Seed

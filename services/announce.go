@@ -29,7 +29,7 @@ func StartAnnounce(ctx context.Context, announceKey string, version string, node
 		return
 	}
 
-	ticker := time.NewTicker(15 * time.Second)
+	ticker := time.NewTicker(90 * time.Second)
 	defer ticker.Stop()
 
 	dir := new(Directory)
@@ -56,7 +56,7 @@ func StartAnnounce(ctx context.Context, announceKey string, version string, node
 				directoryEntry := DirectoryEntry{
 					Name:  announceKey,
 					Entry: string(data),
-					Mode:  "short",
+					Mode:  "normal",
 				}
 
 				req, err := http.NewRequestWithContext(ctx, "POST", "", nil)
